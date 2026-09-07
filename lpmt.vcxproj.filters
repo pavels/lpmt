@@ -94,13 +94,7 @@
     <ClCompile Include="src\timeline\kiss\kiss_fftr.c">
       <Filter>src\timeline\kiss</Filter>
     </ClCompile>
-    <ClCompile Include="src\timeline\ofOpenALSoundPlayer_TimelineAdditions.cpp">
-      <Filter>src\timeline</Filter>
-    </ClCompile>
     <ClCompile Include="src\timeline\ofxTimeline.cpp">
-      <Filter>src\timeline</Filter>
-    </ClCompile>
-    <ClCompile Include="src\timeline\ofxTLAudioTrack.cpp">
       <Filter>src\timeline</Filter>
     </ClCompile>
     <ClCompile Include="src\timeline\ofxTLBangs.cpp">
@@ -737,16 +731,10 @@
     <ClInclude Include="src\timeline\libsndfile\sndfile.hh">
       <Filter>src\timeline\libsndfile</Filter>
     </ClInclude>
-    <ClInclude Include="src\timeline\ofOpenALSoundPlayer_TimelineAdditions.h">
-      <Filter>src\timeline</Filter>
-    </ClInclude>
     <ClInclude Include="src\timeline\ofxHotKeys.h">
       <Filter>src\timeline</Filter>
     </ClInclude>
     <ClInclude Include="src\timeline\ofxTimeline.h">
-      <Filter>src\timeline</Filter>
-    </ClInclude>
-    <ClInclude Include="src\timeline\ofxTLAudioTrack.h">
       <Filter>src\timeline</Filter>
     </ClInclude>
     <ClInclude Include="src\timeline\ofxTLBangs.h">

@@ -5,6 +5,7 @@
 #include <string>
 #include <sys/types.h>
 #include <vector>
+#include <list>
 
 quad::quad()
 {
@@ -1104,7 +1105,7 @@ void quad::maskAddPoint(ofPoint point)
     if ((m_maskPoints.empty()) || (m_maskPoints.size() == 1)) {
         m_maskPoints.push_back(normalizedPoint);
     } else {
-        list<ofVec3f> pts;
+        std::list<ofVec3f> pts;
 
         float min_diff = RAND_MAX;
         for (unsigned int i = 0; i < m_maskPoints.size(); i++) {

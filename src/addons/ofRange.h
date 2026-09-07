@@ -10,6 +10,8 @@
 //----------------------------------------------------------
 #pragma once
 
+#include <iostream>
+
 template<typename T>
 class ofRange_ {
   public:
@@ -163,12 +165,12 @@ class ofRange_ {
 	
     
 	
-    inline friend ostream& operator<<(ostream& os, const ofRange_<T>& rg) {
+    inline friend std::ostream& operator<<(std::ostream& os, const ofRange_<T>& rg) {
         os << "[" << rg.min << " - " << rg.max << "]";
         return os;
     }
     
-    inline friend istream& operator>>(istream& is, ofRange_<T>& rg) {
+    inline friend std::istream& operator>>(std::istream& is, ofRange_<T>& rg) {
         is.ignore(1);
         is >> rg.min;
         is.ignore(3);

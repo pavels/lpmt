@@ -121,7 +121,7 @@ void ofxSimpleGuiQuadWarp::draw(float x, float y) {
 	for(int i=0; i<4; i++) {
 		ofVertex(pts[i].x, pts[i].y);
 	}
-	ofEndShape(TRUE);
+	ofEndShape(true);
 	ofDisableAlphaBlending();
 
 	glPopMatrix();

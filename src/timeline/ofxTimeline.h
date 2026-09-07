@@ -33,6 +33,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include <set>
 
 //For lack of a type abstraction, this let's you #define a font renderer before including ofxTimeline
 //(like ofxFTGL or ofxFont)
@@ -72,11 +73,6 @@
 #ifdef TIMELINE_VIDEO_INCLUDED
 #include "ofxTLVideoTrack.h"
 #endif
-
-#ifdef TIMELINE_AUDIO_INCLUDED
-#include "ofxTLAudioTrack.h"
-#endif
-
 
 typedef struct {
     ofxTLTrack* track;
@@ -395,14 +391,6 @@ class ofxTimeline : ofThread {
     ofPtr<ofVideoPlayer> getVideoPlayer(string videoTrackName);
 	#endif
     
-	#ifdef TIMELINE_AUDIO_INCLUDED
-    //Audio tracks only work with PCM Wav or Aiff file
-    ofxTLAudioTrack* addAudioTrack(string trackName);
-    ofxTLAudioTrack* addAudioTrackWithPath(string audioPath);
-    ofxTLAudioTrack* addAudioTrack(string name, string audioPath);
-    ofxTLAudioTrack* getAudioTrack(string audioTrackName);
-	#endif
-
     //used for audio and video.
     //we punt to the track to control time.
     //this can be a video or audio track
@@ -523,7 +511,7 @@ class ofxTimeline : ofThread {
     //this is populated on mouse-down or key-down with all items that could potentially be modified
 	vector<UndoItem> stateBuffers; 
     //then after the events are propagated all the modified tracks are collected here 
-    set<ofxTLTrack*> modifiedTracks;
+    std::set<ofxTLTrack*> modifiedTracks;
     //finally, the state buffers for the tracks that were modified are pushed onto the stack say that state may be returned
     deque< vector<UndoItem> > undoStack;
     //the undo pointer points into the array and lets the user move through undo/redo actions

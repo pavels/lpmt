@@ -1,6 +1,9 @@
 bin/lpmtDebug.app/
 .DS_Store
 bin/lpmt
+bin/libfmod.so
+bin/data/_lpmt_settings.xml
+bin/data/_lpmt_settings.xml
 bin/lpmt_debug
 bin/lpmt.app/
 build/

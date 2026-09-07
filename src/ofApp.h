@@ -34,7 +34,6 @@
 #include "ofxMidi.h"
 #endif
 
-
 #ifdef WITH_MIDI
 class ofApp : public ofBaseApp, public ofxMidiListener
 #else
@@ -238,5 +237,6 @@ public:
     float lastFrameTime;
     */
 
+    int fullscreenDelayFrames = 0;
 };
 

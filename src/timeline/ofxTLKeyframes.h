@@ -36,6 +36,7 @@
 #include "ofRange.h"
 #include "ofxTLTrack.h"
 #include "ofxXmlSettings.h"
+#include <set>
 
 class ofxTLKeyframe {
   public:
@@ -64,7 +65,7 @@ class ofxTLKeyframes : public ofxTLTrack
 	
 	virtual void keyPressed(ofKeyEventArgs& args);
 
-	virtual void getSnappingPoints(set<unsigned long long>& points);
+	virtual void getSnappingPoints(std::set<unsigned long long>& points);
 	
 	virtual void save();
 	virtual void load();

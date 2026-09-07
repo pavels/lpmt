@@ -29,6 +29,15 @@ void ofApp::setup()
     ofSetEscapeQuitsApp(false);
     autoStart = false;
 
+    // Check if config exists, if not, copy default
+    if (!ofFile::doesFileExist("config.xml", true)) {
+        ofLogNotice() << "Config file \"config.xml\" not found, copying default.";
+
+        if (!ofFile::copyFromTo("config-default.xml", "config.xml", false, true)) {
+            ofLogError() << "Failed to copy \"config-default.xml\" to \"config.xml\"!";
+        }
+    }    
+
     // read xml config file
     bWasConfigLoadSuccessful = xmlConfigFile.loadFile("config.xml");
     if (!bWasConfigLoadSuccessful) {
@@ -157,9 +166,8 @@ void ofApp::setup()
         m_gui.updatePages(quads[activeQuad]);
 
         toggleEditMode();
-
-        bFullscreen = true;
-        ofSetFullscreen(true);
+	
+	    fullscreenDelayFrames = 5;
     }
 
     ofSetWindowTitle("LPMT");
@@ -388,6 +396,15 @@ void ofApp::update()
         }
         prepare();
     }
+    
+    if (fullscreenDelayFrames > 0) {
+	fullscreenDelayFrames--;
+
+        if (fullscreenDelayFrames == 0) {
+            bFullscreen = true;
+	    ofSetFullscreen(true);
+        }
+    }
 }
 
 //--------------------------------------------------------------
@@ -485,6 +502,7 @@ void ofApp::keyPressed(int key)
 {
     if(m_loadProjectFlag || m_saveProjectFlag) return;
 
+
     if (bMidiHotkeyCoupling) {
         bMidiHotkeyLearning = true;
         midiHotkeyPressed = key;
@@ -501,6 +519,82 @@ void ofApp::keyPressed(int key)
 void ofApp::keyPressed(ofKeyEventArgs& args)
 {
     if(m_loadProjectFlag || m_saveProjectFlag) return;
+
+    // Keyboard control for quad corners
+    if (isEditMode && !bGui && !maskSetup && !gridSetup && !bTimeline) {
+
+        quad &q = quads[activeQuad];
+
+        auto selectCorner = [&](int corner) {
+            m_selectedCorner = corner;
+            q.bHighlightCorner = true;
+            q.highlightedCorner = corner;
+        };
+
+        // Ctrl + arrows = select corner
+        //
+        // 0 ---- 1
+        // |      |
+        // 3 ---- 2
+        //
+        if (args.hasModifier(OF_KEY_CONTROL)) {
+            switch (args.key) {
+                case OF_KEY_UP:
+                    if (m_selectedCorner == 3) selectCorner(0);
+                    else if (m_selectedCorner == 2) selectCorner(1);
+                    else if (m_selectedCorner < 0) selectCorner(0);
+                    return;
+
+                case OF_KEY_DOWN:
+                    if (m_selectedCorner == 0) selectCorner(3);
+                    else if (m_selectedCorner == 1) selectCorner(2);
+                    else if (m_selectedCorner < 0) selectCorner(3);
+                    return;
+
+                case OF_KEY_LEFT:
+                    if (m_selectedCorner == 1) selectCorner(0);
+                    else if (m_selectedCorner == 2) selectCorner(3);
+                    else if (m_selectedCorner < 0) selectCorner(0);
+                    return;
+
+                case OF_KEY_RIGHT:
+                    if (m_selectedCorner == 0) selectCorner(1);
+                    else if (m_selectedCorner == 3) selectCorner(2);
+                    else if (m_selectedCorner < 0) selectCorner(1);
+                    return;
+            }
+        }
+
+        // Move selected corner
+        if (m_selectedCorner >= 0 && m_selectedCorner < 4) {
+
+            float dx = 1.0f / (float)ofGetWidth();
+            float dy = 1.0f / (float)ofGetHeight();
+
+            if (args.hasModifier(OF_KEY_SHIFT)) {
+                dx *= 10.0f;
+                dy *= 10.0f;
+            }
+
+            switch (args.key) {
+                case OF_KEY_LEFT:
+                    q.corners[m_selectedCorner].x -= dx;
+                    return;
+
+                case OF_KEY_RIGHT:
+                    q.corners[m_selectedCorner].x += dx;
+                    return;
+
+                case OF_KEY_UP:
+                    q.corners[m_selectedCorner].y -= dy;
+                    return;
+
+                case OF_KEY_DOWN:
+                    q.corners[m_selectedCorner].y += dy;
+                    return;
+            }
+        }
+    }
 
     if (args.hasModifier(OF_KEY_CONTROL) && (args.keycode == 'Q')) {
         ofExit(1);

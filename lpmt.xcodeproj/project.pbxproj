@@ -12908,42 +12908,12 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
-			<key>22078A6441BDBFB5E24FDA90</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.c.h</string>
-				<key>fileEncoding</key>
-				<string>4</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>ofxTLAudioTrack.h</string>
-				<key>path</key>
-				<string>src/timeline/ofxTLAudioTrack.h</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
 			<key>480230FFB6AFF9B18855EE09</key>
 			<dict>
 				<key>fileRef</key>
 				<string>76633BFF0DEC1254811C84AA</string>
 				<key>isa</key>
 				<string>PBXBuildFile</string>
-			</dict>
-			<key>76633BFF0DEC1254811C84AA</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.cpp.cpp</string>
-				<key>fileEncoding</key>
-				<string>4</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>ofxTLAudioTrack.cpp</string>
-				<key>path</key>
-				<string>src/timeline/ofxTLAudioTrack.cpp</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
 			</dict>
 			<key>328594985FE3F60026D08319</key>
 			<dict>
@@ -12997,42 +12967,12 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
-			<key>D23A35B76559E5381372B03B</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.c.h</string>
-				<key>fileEncoding</key>
-				<string>4</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>ofOpenALSoundPlayer_TimelineAdditions.h</string>
-				<key>path</key>
-				<string>src/timeline/ofOpenALSoundPlayer_TimelineAdditions.h</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
 			<key>0379017B3DE4E3B7169D6B2A</key>
 			<dict>
 				<key>fileRef</key>
 				<string>E616844004C8E2981E49E2D4</string>
 				<key>isa</key>
 				<string>PBXBuildFile</string>
-			</dict>
-			<key>E616844004C8E2981E49E2D4</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.cpp.cpp</string>
-				<key>fileEncoding</key>
-				<string>4</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>ofOpenALSoundPlayer_TimelineAdditions.cpp</string>
-				<key>path</key>
-				<string>src/timeline/ofOpenALSoundPlayer_TimelineAdditions.cpp</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
 			</dict>
 			<key>CE51E8513E7AE758672D0951</key>
 			<dict>

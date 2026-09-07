@@ -2004,36 +2004,6 @@ ofPtr<ofVideoPlayer> ofxTimeline::getVideoPlayer(string videoTrackName){
 }
 #endif
 
-#ifdef TIMELINE_AUDIO_INCLUDED
-ofxTLAudioTrack* ofxTimeline::addAudioTrack(string trackName){
-    return addAudioTrack(trackName, "");
-}
-
-ofxTLAudioTrack* ofxTimeline::addAudioTrackWithPath(string audioPath){
-    return addAudioTrack("audio", audioPath);
-}
-
-ofxTLAudioTrack* ofxTimeline::addAudioTrack(string trackName, string audioPath){
-    ofxTLAudioTrack* audioTrack = new ofxTLAudioTrack();
-    audioTrack->setCreatedByTimeline(true);
-    addTrack(confirmedUniqueName(trackName), audioTrack);
-    if(audioPath != ""){
-        if(!audioTrack->loadSoundfile(audioPath)){
-            ofLogError("ofxTimeline::addAudioTrack -- audio file " + audioPath + " failed to load. Use only WAV and AIFF files");
-        }
-    }
-    return audioTrack;
-}
-
-ofxTLAudioTrack* ofxTimeline::getAudioTrack(string audioTrackName){
-    return (ofxTLAudioTrack*)getTrack(audioTrackName);
-}
-
-ofxTLTrackHeader* ofxTimeline::getTrackHeader(string trackName){
-    return getTrackHeader(getTrack(name));    
-}
-#endif
-
 ofxTLTrackHeader* ofxTimeline::getTrackHeader(ofxTLTrack* track){
     return trackNameToPage[track->getName()]->getTrackHeader(track);
 }

@@ -549,7 +549,7 @@ void ofxTLKeyframes::setKeyframeTime(ofxTLKeyframe* key, unsigned long long newT
 	key->time = newTime;
 }
 
-void ofxTLKeyframes::getSnappingPoints(set<unsigned long long>& points){
+void ofxTLKeyframes::getSnappingPoints(std::set<unsigned long long>& points){
 	for(int i = 0; i < keyframes.size(); i++){
 		if (isKeyframeIsInBounds(keyframes[i]) && !isKeyframeSelected(keyframes[i])) {
 			points.insert(keyframes[i]->time);

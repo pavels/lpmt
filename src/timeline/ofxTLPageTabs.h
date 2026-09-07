@@ -35,6 +35,7 @@
 #include "ofMain.h"
 #include "ofxTLTrack.h"
 #include "ofxTLEvents.h"
+#include <set>
 
 typedef struct{
 	string name;

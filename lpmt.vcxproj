@@ -231,9 +231,7 @@
     <ClCompile Include="src\quad.cpp" />
     <ClCompile Include="src\timeline\kiss\kiss_fft.c" />
     <ClCompile Include="src\timeline\kiss\kiss_fftr.c" />
-    <ClCompile Include="src\timeline\ofOpenALSoundPlayer_TimelineAdditions.cpp" />
     <ClCompile Include="src\timeline\ofxTimeline.cpp" />
-    <ClCompile Include="src\timeline\ofxTLAudioTrack.cpp" />
     <ClCompile Include="src\timeline\ofxTLBangs.cpp" />
     <ClCompile Include="src\timeline\ofxTLCameraTrack.cpp" />
     <ClCompile Include="src\timeline\ofxTLColors.cpp" />
@@ -358,10 +356,8 @@
     <ClInclude Include="src\timeline\kiss\_kiss_fft_guts.h" />
     <ClInclude Include="src\timeline\libsndfile\sndfile.h" />
     <ClInclude Include="src\timeline\libsndfile\sndfile.hh" />
-    <ClInclude Include="src\timeline\ofOpenALSoundPlayer_TimelineAdditions.h" />
     <ClInclude Include="src\timeline\ofxHotKeys.h" />
     <ClInclude Include="src\timeline\ofxTimeline.h" />
-    <ClInclude Include="src\timeline\ofxTLAudioTrack.h" />
     <ClInclude Include="src\timeline\ofxTLBangs.h" />
     <ClInclude Include="src\timeline\ofxTLCameraTrack.h" />
     <ClInclude Include="src\timeline\ofxTLColors.h" />
