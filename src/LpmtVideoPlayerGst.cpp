@@ -17,6 +17,7 @@ namespace {
 
 const char* PIPELINE_TEMPLATE =
     "filesrc name=src ! qtdemux name=demux ! queue ! h264parse ! vah264dec ! "
+    "video/x-raw, format=NV12 ! "
     "glupload ! glcolorconvert ! "
     "appsink name=sink emit-signals=true sync=true max-buffers=2 drop=false "
     "caps=video/x-raw(memory:GLMemory),format=RGBA,texture-target=%s";
@@ -41,6 +42,8 @@ void main() {
 
 GstGLDisplay* gGlDisplay = nullptr;
 GstGLContext* gGlContext = nullptr;
+GstContext*   gVaContext = nullptr;
+std::mutex    gVaContextMx;
 
 void ensureGstInit() {
     static std::once_flag flag;
@@ -149,8 +152,28 @@ private:
 };
 
 GstBusSyncReply GstHwImpl::onBusSync(GstBus*, GstMessage* msg, gpointer user) {
-    if (GST_MESSAGE_TYPE(msg) != GST_MESSAGE_NEED_CONTEXT) return GST_BUS_PASS;
     auto* self = static_cast<GstHwImpl*>(user);
+
+    if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_HAVE_CONTEXT) {
+        GstContext* ctx = nullptr;
+        gst_message_parse_have_context(msg, &ctx);
+        if (ctx) {
+            const gchar* ctxType = gst_context_get_context_type(ctx);
+            ofLogNotice("LpmtVideoPlayer")
+                << "[" << self->tag << "] HAVE_CONTEXT type=" << (ctxType ? ctxType : "?");
+            if (g_strcmp0(ctxType, "gst.va.display.handle") == 0) {
+                std::lock_guard<std::mutex> lk(gVaContextMx);
+                if (!gVaContext) {
+                    gVaContext = gst_context_ref(ctx);
+                    ofLogNotice("LpmtVideoPlayer") << "cached VA display context";
+                }
+            }
+            gst_context_unref(ctx);
+        }
+        return GST_BUS_PASS;
+    }
+
+    if (GST_MESSAGE_TYPE(msg) != GST_MESSAGE_NEED_CONTEXT) return GST_BUS_PASS;
     const gchar* type = nullptr;
     gst_message_parse_context_type(msg, &type);
     GstElement* src = GST_ELEMENT(GST_MESSAGE_SRC(msg));
@@ -168,6 +191,12 @@ GstBusSyncReply GstHwImpl::onBusSync(GstBus*, GstMessage* msg, gpointer user) {
         gst_structure_set(s, "context", GST_TYPE_GL_CONTEXT, gGlContext, NULL);
         gst_element_set_context(src, c);
         gst_context_unref(c);
+    } else if (g_strcmp0(type, "gst.va.display.handle") == 0) {
+        std::lock_guard<std::mutex> lk(gVaContextMx);
+        if (gVaContext) {
+            gst_element_set_context(src, gVaContext);
+            ofLogNotice("LpmtVideoPlayer") << "[" << self->tag << "] provided cached VA context";
+        }
     }
     return GST_BUS_PASS;
 }
@@ -210,6 +239,14 @@ bool GstHwImpl::tryBuild(const std::string& path, const char* target) {
     gst_bus_set_sync_handler(bus, &GstHwImpl::onBusSync, this, nullptr);
     gst_object_unref(bus);
 
+    {
+        std::lock_guard<std::mutex> lk(gVaContextMx);
+        if (gVaContext) {
+            gst_element_set_context(p, gVaContext);
+            ofLogNotice("LpmtVideoPlayer") << "[" << tag << "] pre-set cached VA context on pipeline";
+        }
+    }
+
     gst_element_set_state(p, GST_STATE_PAUSED);
     GstState st = GST_STATE_NULL, pend = GST_STATE_NULL;
     GstStateChangeReturn ret = gst_element_get_state(p, &st, &pend, 5 * GST_SECOND);
@@ -224,7 +261,7 @@ bool GstHwImpl::tryBuild(const std::string& path, const char* target) {
         << "[" << tag << "] state change to PAUSED: " << retStr
         << " state=" << gst_element_state_get_name(st)
         << " pending=" << gst_element_state_get_name(pend);
-    if (ret == GST_STATE_CHANGE_FAILURE || ret == GST_STATE_CHANGE_ASYNC) {
+    if (ret == GST_STATE_CHANGE_FAILURE) {
         gst_element_set_state(p, GST_STATE_NULL);
         gst_object_unref(p);
         sink = nullptr;
