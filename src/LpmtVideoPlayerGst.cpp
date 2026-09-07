@@ -111,6 +111,8 @@ private:
 
     GstElement* pipeline = nullptr;
     GstElement* sink     = nullptr;
+    GstVideoInfo videoInfo{};
+    bool loggedTarget = false;
 
     enum class Mode { RectDirect, TwoDBlit };
     Mode mode = Mode::RectDirect;
@@ -202,10 +204,9 @@ bool GstHwImpl::tryBuild(const std::string& path, const char* target) {
     GstPad* pad = gst_element_get_static_pad(sink, "sink");
     GstCaps* caps = gst_pad_get_current_caps(pad);
     if (caps) {
-        GstVideoInfo info;
-        if (gst_video_info_from_caps(&info, caps)) {
-            width  = info.width;
-            height = info.height;
+        if (gst_video_info_from_caps(&videoInfo, caps)) {
+            width  = videoInfo.width;
+            height = videoInfo.height;
         }
         gst_caps_unref(caps);
     }
@@ -385,10 +386,22 @@ ofTexture& GstHwImpl::getTexture() {
         }
         if (s) {
             GstBuffer* buf = gst_sample_get_buffer(s);
-            GstMemory* mem = gst_buffer_peek_memory(buf, 0);
-            if (mem && gst_is_gl_memory(mem)) {
-                GstGLMemory* glmem = (GstGLMemory*)mem;
-                GLuint id = glmem->tex_id;
+            GstVideoFrame frame;
+            if (gst_video_frame_map(&frame, &videoInfo, buf,
+                    (GstMapFlags)(GST_MAP_READ | GST_MAP_GL))) {
+                GLuint id = *(GLuint*)frame.data[0];
+                if (!loggedTarget) {
+                    GstMemory* mem = gst_buffer_peek_memory(buf, 0);
+                    GstGLTextureTarget t = GST_GL_TEXTURE_TARGET_NONE;
+                    if (mem && gst_is_gl_memory(mem)) {
+                        t = gst_gl_memory_get_texture_target((GstGLMemory*)mem);
+                    }
+                    ofLogNotice("LpmtVideoPlayer")
+                        << "first sample: id=" << id
+                        << " target=" << gst_gl_texture_target_to_string(t)
+                        << " " << width << "x" << height;
+                    loggedTarget = true;
+                }
                 if (mode == Mode::RectDirect) {
                     outTex.setUseExternalTextureID(id);
                 } else if (blitReady) {
@@ -402,6 +415,7 @@ ofTexture& GstHwImpl::getTexture() {
                     blitShader.end();
                     blitFbo.end();
                 }
+                gst_video_frame_unmap(&frame);
             }
             gst_sample_unref(s);
         }
