@@ -10,6 +10,7 @@
 #include <GL/glx.h>
 
 #include <atomic>
+#include <cstring>
 #include <mutex>
 
 namespace {
@@ -47,13 +48,20 @@ void ensureGstInit() {
 }
 
 void ensureGlBridge() {
-    if (gGlDisplay) return;
+    if (gGlDisplay && gGlContext) return;
     Display* xd = glXGetCurrentDisplay();
-    GLXContext gl = glXGetCurrentContext();
-    if (!xd || !gl) return;
-    gGlDisplay = GST_GL_DISPLAY(gst_gl_display_x11_new_with_display(xd));
-    gGlContext = gst_gl_context_new_wrapped(gGlDisplay, (guintptr)gl,
-        GST_GL_PLATFORM_GLX, GST_GL_API_OPENGL);
+    GLXContext glx = glXGetCurrentContext();
+    if (!xd || !glx) return;
+    if (!gGlDisplay) {
+        gGlDisplay = GST_GL_DISPLAY(gst_gl_display_x11_new_with_display(xd));
+    }
+    if (!gGlContext && gGlDisplay) {
+        gGlContext = gst_gl_context_new_wrapped(gGlDisplay, (guintptr)glx,
+            GST_GL_PLATFORM_GLX, GST_GL_API_OPENGL);
+        ofLogNotice("LpmtVideoPlayer")
+            << "GL bridge created: display=" << (void*)gGlDisplay
+            << " context=" << (void*)gGlContext << " glx=" << (void*)glx;
+    }
 }
 
 void onDemuxPadAdded(GstElement*, GstPad* pad, gpointer user) {
@@ -109,10 +117,11 @@ private:
     void configureRectTex();
     void configureBlit();
 
-    GstElement* pipeline = nullptr;
-    GstElement* sink     = nullptr;
-    GstVideoInfo videoInfo{};
+    GstElement*   pipeline  = nullptr;
+    GstElement*   sink      = nullptr;
+    GstVideoInfo  videoInfo{};
     bool loggedTarget = false;
+    std::string   tag;
 
     enum class Mode { RectDirect, TwoDBlit };
     Mode mode = Mode::RectDirect;
@@ -126,6 +135,7 @@ private:
     ofFbo     blitFbo;
     ofShader  blitShader;
     bool      blitReady = false;
+    bool      firstSampleLogged = false;
 
     int width  = 0;
     int height = 0;
@@ -138,11 +148,15 @@ private:
     std::string sourcePath;
 };
 
-GstBusSyncReply GstHwImpl::onBusSync(GstBus*, GstMessage* msg, gpointer) {
+GstBusSyncReply GstHwImpl::onBusSync(GstBus*, GstMessage* msg, gpointer user) {
     if (GST_MESSAGE_TYPE(msg) != GST_MESSAGE_NEED_CONTEXT) return GST_BUS_PASS;
+    auto* self = static_cast<GstHwImpl*>(user);
     const gchar* type = nullptr;
     gst_message_parse_context_type(msg, &type);
     GstElement* src = GST_ELEMENT(GST_MESSAGE_SRC(msg));
+    ofLogNotice("LpmtVideoPlayer")
+        << "[" << self->tag << "] NEED_CONTEXT type=" << (type ? type : "?")
+        << " src=" << GST_ELEMENT_NAME(src);
     if (g_strcmp0(type, GST_GL_DISPLAY_CONTEXT_TYPE) == 0 && gGlDisplay) {
         GstContext* c = gst_context_new(GST_GL_DISPLAY_CONTEXT_TYPE, TRUE);
         gst_context_set_gl_display(c, gGlDisplay);
@@ -162,6 +176,10 @@ void GstHwImpl::onNewSample(GstElement* el, gpointer user) {
     GstSample* s = gst_app_sink_pull_sample(GST_APP_SINK(el));
     if (!s) return;
     auto* self = static_cast<GstHwImpl*>(user);
+    if (!self->firstSampleLogged) {
+        self->firstSampleLogged = true;
+        ofLogNotice("LpmtVideoPlayer") << "[" << self->tag << "] first new-sample delivered";
+    }
     std::lock_guard<std::mutex> lk(self->heldMx);
     if (self->held) gst_sample_unref(self->held);
     self->held = s;
@@ -169,11 +187,12 @@ void GstHwImpl::onNewSample(GstElement* el, gpointer user) {
 }
 
 bool GstHwImpl::tryBuild(const std::string& path, const char* target) {
+    ofLogNotice("LpmtVideoPlayer") << "[" << tag << "] tryBuild target=" << target;
     gchar* desc = g_strdup_printf(PIPELINE_TEMPLATE, target);
     GError* err = nullptr;
     GstElement* p = gst_parse_launch(desc, &err);
     g_free(desc);
-    if (err) { ofLogError("LpmtVideoPlayer") << "parse: " << err->message; g_error_free(err); }
+    if (err) { ofLogError("LpmtVideoPlayer") << "[" << tag << "] parse: " << err->message; g_error_free(err); }
     if (!p) return false;
 
     GstElement* src = gst_bin_get_by_name(GST_BIN(p), "src");
@@ -192,9 +211,20 @@ bool GstHwImpl::tryBuild(const std::string& path, const char* target) {
     gst_object_unref(bus);
 
     gst_element_set_state(p, GST_STATE_PAUSED);
-    GstState st, pend;
+    GstState st = GST_STATE_NULL, pend = GST_STATE_NULL;
     GstStateChangeReturn ret = gst_element_get_state(p, &st, &pend, 5 * GST_SECOND);
-    if (ret == GST_STATE_CHANGE_FAILURE) {
+    const char* retStr = "?";
+    switch (ret) {
+        case GST_STATE_CHANGE_SUCCESS:  retStr = "SUCCESS"; break;
+        case GST_STATE_CHANGE_ASYNC:    retStr = "ASYNC"; break;
+        case GST_STATE_CHANGE_FAILURE:  retStr = "FAILURE"; break;
+        case GST_STATE_CHANGE_NO_PREROLL: retStr = "NO_PREROLL"; break;
+    }
+    ofLogNotice("LpmtVideoPlayer")
+        << "[" << tag << "] state change to PAUSED: " << retStr
+        << " state=" << gst_element_state_get_name(st)
+        << " pending=" << gst_element_state_get_name(pend);
+    if (ret == GST_STATE_CHANGE_FAILURE || ret == GST_STATE_CHANGE_ASYNC) {
         gst_element_set_state(p, GST_STATE_NULL);
         gst_object_unref(p);
         sink = nullptr;
@@ -204,11 +234,16 @@ bool GstHwImpl::tryBuild(const std::string& path, const char* target) {
     GstPad* pad = gst_element_get_static_pad(sink, "sink");
     GstCaps* caps = gst_pad_get_current_caps(pad);
     if (caps) {
+        gchar* cs = gst_caps_to_string(caps);
+        ofLogNotice("LpmtVideoPlayer") << "[" << tag << "] sink caps: " << (cs ? cs : "?");
+        g_free(cs);
         if (gst_video_info_from_caps(&videoInfo, caps)) {
             width  = videoInfo.width;
             height = videoInfo.height;
         }
         gst_caps_unref(caps);
+    } else {
+        ofLogWarning("LpmtVideoPlayer") << "[" << tag << "] sink has no caps after PAUSED";
     }
     gst_object_unref(pad);
 
@@ -259,21 +294,31 @@ void GstHwImpl::load(const std::string& path) {
     teardown();
     ensureGstInit();
     ensureGlBridge();
+    if (!gGlDisplay || !gGlContext) {
+        ofLogError("LpmtVideoPlayer") << "no GL bridge (call load from main GL thread)";
+        return;
+    }
 
+    {
+        const char* slash = strrchr(path.c_str(), '/');
+        tag = slash ? (slash + 1) : path;
+        if (tag.size() > 32) tag = tag.substr(0, 32);
+    }
     sourcePath = path;
+    ofLogNotice("LpmtVideoPlayer") << "[" << tag << "] load begin path=" << path;
 
     if (tryBuild(path, "rectangle")) {
         mode = Mode::RectDirect;
         configureRectTex();
         ofLogNotice("LpmtVideoPlayer")
-            << path << ": hw decode rectangle-direct " << width << "x" << height;
+            << "[" << tag << "] hw decode rectangle-direct " << width << "x" << height;
     } else if (tryBuild(path, "2D")) {
         mode = Mode::TwoDBlit;
         configureBlit();
         ofLogNotice("LpmtVideoPlayer")
-            << path << ": hw decode 2D+blit " << width << "x" << height;
+            << "[" << tag << "] hw decode 2D+blit " << width << "x" << height;
     } else {
-        ofLogError("LpmtVideoPlayer") << path << ": pipeline build failed";
+        ofLogError("LpmtVideoPlayer") << "[" << tag << "] pipeline build failed";
         return;
     }
     loaded  = true;
@@ -296,6 +341,7 @@ void GstHwImpl::teardown() {
     loaded = false; playing = false; paused = false;
     width = height = 0;
     blitReady = false;
+    loggedTarget = false;
 }
 
 void GstHwImpl::seekSegment(bool flush) {
@@ -315,7 +361,15 @@ void GstHwImpl::play() {
         gst_element_seek_simple(pipeline, GST_FORMAT_TIME,
             GstSeekFlags(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT), 0);
     }
-    gst_element_set_state(pipeline, GST_STATE_PLAYING);
+    GstStateChangeReturn r = gst_element_set_state(pipeline, GST_STATE_PLAYING);
+    const char* rs = "?";
+    switch (r) {
+        case GST_STATE_CHANGE_SUCCESS:  rs = "SUCCESS"; break;
+        case GST_STATE_CHANGE_ASYNC:    rs = "ASYNC"; break;
+        case GST_STATE_CHANGE_FAILURE:  rs = "FAILURE"; break;
+        case GST_STATE_CHANGE_NO_PREROLL: rs = "NO_PREROLL"; break;
+    }
+    ofLogNotice("LpmtVideoPlayer") << "[" << tag << "] play -> PLAYING: " << rs;
     playing = true;
     paused  = false;
 }
@@ -352,7 +406,8 @@ void GstHwImpl::update() {
     GstBus* bus = gst_element_get_bus(pipeline);
     GstMessage* msg = nullptr;
     while ((msg = gst_bus_pop_filtered(bus,
-             GstMessageType(GST_MESSAGE_SEGMENT_DONE | GST_MESSAGE_EOS | GST_MESSAGE_ERROR))) != nullptr) {
+             GstMessageType(GST_MESSAGE_SEGMENT_DONE | GST_MESSAGE_EOS
+                          | GST_MESSAGE_ERROR | GST_MESSAGE_WARNING))) != nullptr) {
         switch (GST_MESSAGE_TYPE(msg)) {
         case GST_MESSAGE_SEGMENT_DONE:
             if (loopMode == OF_LOOP_NORMAL) seekSegment(false);
@@ -364,10 +419,20 @@ void GstHwImpl::update() {
         case GST_MESSAGE_ERROR: {
             GError* e = nullptr; gchar* d = nullptr;
             gst_message_parse_error(msg, &e, &d);
-            ofLogError("LpmtVideoPlayer") << (e ? e->message : "?") << " | " << (d ? d : "");
+            ofLogError("LpmtVideoPlayer") << "[" << tag << "] ERROR: "
+                << (e ? e->message : "?") << " | " << (d ? d : "");
             if (e) g_error_free(e);
             g_free(d);
             playing = false;
+            break;
+        }
+        case GST_MESSAGE_WARNING: {
+            GError* e = nullptr; gchar* d = nullptr;
+            gst_message_parse_warning(msg, &e, &d);
+            ofLogWarning("LpmtVideoPlayer") << "[" << tag << "] WARN: "
+                << (e ? e->message : "?") << " | " << (d ? d : "");
+            if (e) g_error_free(e);
+            g_free(d);
             break;
         }
         default: break;
@@ -397,7 +462,7 @@ ofTexture& GstHwImpl::getTexture() {
                         t = gst_gl_memory_get_texture_target((GstGLMemory*)mem);
                     }
                     ofLogNotice("LpmtVideoPlayer")
-                        << "first sample: id=" << id
+                        << "[" << tag << "] first sample: id=" << id
                         << " target=" << gst_gl_texture_target_to_string(t)
                         << " " << width << "x" << height;
                     loggedTarget = true;
