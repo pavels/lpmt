@@ -414,7 +414,7 @@ void ofxTimeline::pushUndoStack(){
     if(!undoEnabled) return;
     
     vector<UndoItem> undoCollection;
-	set<ofxTLTrack*>::iterator trackit;
+		std::set<ofxTLTrack*>::iterator trackit;
 //    for(int i = 0; i < modifiedTracks.size(); i++){
 	for(trackit = modifiedTracks.begin(); trackit != modifiedTracks.end(); trackit++){
         for(int buf = 0; buf < stateBuffers.size(); buf++){
