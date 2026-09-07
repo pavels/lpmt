@@ -364,7 +364,7 @@ void quad::update()
 }
 
 //---------------------------------------------------------------
-void quad::draw(vector<ofVideoPlayer>& sharedVideos)
+void quad::draw(vector<LpmtVideoPlayer>& sharedVideos)
 {
     if (isOn) {
         // recalculates bezier surface
@@ -765,7 +765,7 @@ void quad::drawDeformation(ofTexture& tex, bool bAlphaFix)
 }
 
 //--------------------------------------------------------------
-void quad::drawSurface(vector<ofVideoPlayer>& sharedVideos)
+void quad::drawSurface(vector<LpmtVideoPlayer>& sharedVideos)
 {
     if (isValidContent(sharedVideos)) {
 
@@ -963,7 +963,7 @@ void quad::drawSurface(vector<ofVideoPlayer>& sharedVideos)
 }
 
 //--------------------------------------------------------------
-bool quad::isValidContent(vector<ofVideoPlayer>& sharedVideos)
+bool quad::isValidContent(vector<LpmtVideoPlayer>& sharedVideos)
 {
     if (colorBg)
         return true;
@@ -982,7 +982,7 @@ bool quad::isValidContent(vector<ofVideoPlayer>& sharedVideos)
 }
 
 //--------------------------------------------------------------
-void quad::drawContent(float w, float h, vector<ofVideoPlayer>& sharedVideos)
+void quad::drawContent(float w, float h, vector<LpmtVideoPlayer>& sharedVideos)
 {
     if (colorBg) {
         blank.draw(0, 0, w, h);

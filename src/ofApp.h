@@ -182,7 +182,7 @@ public:
 	std::vector<ofVideoGrabber>::iterator m_snapshotBackgroundCamera;
 	std::vector<string> m_cameraIds;
 
-    vector<ofVideoPlayer> sharedVideos;
+    vector<LpmtVideoPlayer> sharedVideos;
     vector<string> sharedVideosFiles;
 
     vector<string> imgFiles;

@@ -87,7 +87,14 @@
 #
 #   Note: Leave a leading space when adding list items with the += operator
 ################################################################################
-# PROJECT_DEFINES = 
+# PROJECT_DEFINES =
+
+ifdef WITH_HWDECODE
+    PROJECT_DEFINES += WITH_HWDECODE
+    PROJECT_CFLAGS  += $(shell pkg-config --cflags gstreamer-1.0 gstreamer-gl-1.0 gstreamer-app-1.0 gstreamer-video-1.0)
+    PROJECT_LDFLAGS += $(shell pkg-config --libs   gstreamer-1.0 gstreamer-gl-1.0 gstreamer-app-1.0 gstreamer-video-1.0)
+    PROJECT_LDFLAGS += -lGL -lX11
+endif
 
 ################################################################################
 # PROJECT CFLAGS

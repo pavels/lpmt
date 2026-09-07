@@ -1,0 +1,422 @@
+#ifdef WITH_HWDECODE
+
+#include "LpmtVideoPlayerImpl.h"
+
+#include <gst/gst.h>
+#include <gst/gl/gl.h>
+#include <gst/gl/x11/gstgldisplay_x11.h>
+#include <gst/app/gstappsink.h>
+#include <gst/video/video.h>
+#include <GL/glx.h>
+
+#include <atomic>
+#include <mutex>
+
+namespace {
+
+const char* PIPELINE_TEMPLATE =
+    "filesrc name=src ! qtdemux name=demux ! queue ! h264parse ! vah264dec ! "
+    "glupload ! glcolorconvert ! "
+    "appsink name=sink emit-signals=true sync=true max-buffers=2 drop=false "
+    "caps=video/x-raw(memory:GLMemory),format=RGBA,texture-target=%s";
+
+const char* BLIT_VERT = R"(#version 120
+varying vec2 vT;
+void main() {
+    vT = gl_MultiTexCoord0.xy;
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+)";
+
+const char* BLIT_FRAG = R"(#version 120
+uniform sampler2D src;
+uniform int flipY;
+varying vec2 vT;
+void main() {
+    vec2 uv = (flipY == 1) ? vec2(vT.x, 1.0 - vT.y) : vT;
+    gl_FragColor = texture2D(src, uv);
+}
+)";
+
+GstGLDisplay* gGlDisplay = nullptr;
+GstGLContext* gGlContext = nullptr;
+
+void ensureGstInit() {
+    static std::once_flag flag;
+    std::call_once(flag, []{ gst_init(nullptr, nullptr); });
+}
+
+void ensureGlBridge() {
+    if (gGlDisplay) return;
+    Display* xd = glXGetCurrentDisplay();
+    GLXContext gl = glXGetCurrentContext();
+    if (!xd || !gl) return;
+    gGlDisplay = GST_GL_DISPLAY(gst_gl_display_x11_new_with_display(xd));
+    gGlContext = gst_gl_context_new_wrapped(gGlDisplay, (guintptr)gl,
+        GST_GL_PLATFORM_GLX, GST_GL_API_OPENGL);
+}
+
+void onDemuxPadAdded(GstElement*, GstPad* pad, gpointer user) {
+    GstCaps* c = gst_pad_get_current_caps(pad);
+    if (!c) return;
+    const GstStructure* s = gst_caps_get_structure(c, 0);
+    const gchar* name = gst_structure_get_name(s);
+    bool isAudio = g_str_has_prefix(name, "audio/");
+    gst_caps_unref(c);
+    if (!isAudio) return;
+
+    GstElement* pipe = static_cast<GstElement*>(user);
+    GstElement* fake = gst_element_factory_make("fakesink", nullptr);
+    g_object_set(fake, "sync", TRUE, "async", FALSE, NULL);
+    gst_bin_add(GST_BIN(pipe), fake);
+    gst_element_sync_state_with_parent(fake);
+    GstPad* sinkPad = gst_element_get_static_pad(fake, "sink");
+    gst_pad_link(pad, sinkPad);
+    gst_object_unref(sinkPad);
+}
+
+class GstHwImpl : public LpmtVideoPlayer::Impl {
+public:
+    ~GstHwImpl() override { teardown(); }
+
+    void load(const std::string& path) override;
+    void play() override;
+    void stop() override;
+    void close() override { teardown(); }
+    void update() override;
+
+    bool isLoaded() const override { return loaded; }
+    bool isPaused() const override { return paused; }
+    void setPaused(bool p) override;
+    void setSpeed(float s) override;
+    void setVolume(float) override {}
+    void setLoopState(ofLoopType s) override { loopMode = s; }
+    void setPosition(float pct) override;
+
+    float getWidth()  const override { return (float)width;  }
+    float getHeight() const override { return (float)height; }
+
+    ofTexture& getTexture() override;
+    void draw(float x, float y, float w, float h) override;
+
+private:
+    static GstBusSyncReply onBusSync(GstBus*, GstMessage*, gpointer);
+    static void onNewSample(GstElement*, gpointer);
+
+    bool tryBuild(const std::string& path, const char* target);
+    void teardown();
+    void seekSegment(bool flush);
+    void configureRectTex();
+    void configureBlit();
+
+    GstElement* pipeline = nullptr;
+    GstElement* sink     = nullptr;
+
+    enum class Mode { RectDirect, TwoDBlit };
+    Mode mode = Mode::RectDirect;
+
+    std::mutex heldMx;
+    GstSample* held = nullptr;
+    std::atomic<bool> newSample{false};
+
+    ofTexture outTex;
+    ofTexture srcTex2D;
+    ofFbo     blitFbo;
+    ofShader  blitShader;
+    bool      blitReady = false;
+
+    int width  = 0;
+    int height = 0;
+    double rate = 1.0;
+    ofLoopType loopMode = OF_LOOP_NORMAL;
+    bool loaded  = false;
+    bool paused  = false;
+    bool playing = false;
+    bool needsFlipY = true;
+    std::string sourcePath;
+};
+
+GstBusSyncReply GstHwImpl::onBusSync(GstBus*, GstMessage* msg, gpointer) {
+    if (GST_MESSAGE_TYPE(msg) != GST_MESSAGE_NEED_CONTEXT) return GST_BUS_PASS;
+    const gchar* type = nullptr;
+    gst_message_parse_context_type(msg, &type);
+    GstElement* src = GST_ELEMENT(GST_MESSAGE_SRC(msg));
+    if (g_strcmp0(type, GST_GL_DISPLAY_CONTEXT_TYPE) == 0 && gGlDisplay) {
+        GstContext* c = gst_context_new(GST_GL_DISPLAY_CONTEXT_TYPE, TRUE);
+        gst_context_set_gl_display(c, gGlDisplay);
+        gst_element_set_context(src, c);
+        gst_context_unref(c);
+    } else if (g_strcmp0(type, "gst.gl.app_context") == 0 && gGlContext) {
+        GstContext* c = gst_context_new("gst.gl.app_context", TRUE);
+        GstStructure* s = gst_context_writable_structure(c);
+        gst_structure_set(s, "context", GST_TYPE_GL_CONTEXT, gGlContext, NULL);
+        gst_element_set_context(src, c);
+        gst_context_unref(c);
+    }
+    return GST_BUS_PASS;
+}
+
+void GstHwImpl::onNewSample(GstElement* el, gpointer user) {
+    GstSample* s = gst_app_sink_pull_sample(GST_APP_SINK(el));
+    if (!s) return;
+    auto* self = static_cast<GstHwImpl*>(user);
+    std::lock_guard<std::mutex> lk(self->heldMx);
+    if (self->held) gst_sample_unref(self->held);
+    self->held = s;
+    self->newSample.store(true, std::memory_order_release);
+}
+
+bool GstHwImpl::tryBuild(const std::string& path, const char* target) {
+    gchar* desc = g_strdup_printf(PIPELINE_TEMPLATE, target);
+    GError* err = nullptr;
+    GstElement* p = gst_parse_launch(desc, &err);
+    g_free(desc);
+    if (err) { ofLogError("LpmtVideoPlayer") << "parse: " << err->message; g_error_free(err); }
+    if (!p) return false;
+
+    GstElement* src = gst_bin_get_by_name(GST_BIN(p), "src");
+    g_object_set(src, "location", path.c_str(), NULL);
+    gst_object_unref(src);
+
+    GstElement* demux = gst_bin_get_by_name(GST_BIN(p), "demux");
+    g_signal_connect(demux, "pad-added", G_CALLBACK(&onDemuxPadAdded), p);
+    gst_object_unref(demux);
+
+    sink = gst_bin_get_by_name(GST_BIN(p), "sink");
+    g_signal_connect(sink, "new-sample", G_CALLBACK(&GstHwImpl::onNewSample), this);
+
+    GstBus* bus = gst_element_get_bus(p);
+    gst_bus_set_sync_handler(bus, &GstHwImpl::onBusSync, this, nullptr);
+    gst_object_unref(bus);
+
+    gst_element_set_state(p, GST_STATE_PAUSED);
+    GstState st, pend;
+    GstStateChangeReturn ret = gst_element_get_state(p, &st, &pend, 5 * GST_SECOND);
+    if (ret == GST_STATE_CHANGE_FAILURE) {
+        gst_element_set_state(p, GST_STATE_NULL);
+        gst_object_unref(p);
+        sink = nullptr;
+        return false;
+    }
+
+    GstPad* pad = gst_element_get_static_pad(sink, "sink");
+    GstCaps* caps = gst_pad_get_current_caps(pad);
+    if (caps) {
+        GstVideoInfo info;
+        if (gst_video_info_from_caps(&info, caps)) {
+            width  = info.width;
+            height = info.height;
+        }
+        gst_caps_unref(caps);
+    }
+    gst_object_unref(pad);
+
+    pipeline = p;
+    return width > 0 && height > 0;
+}
+
+void GstHwImpl::configureRectTex() {
+    ofTextureData td;
+    td.width  = width;
+    td.height = height;
+    td.tex_w  = width;
+    td.tex_h  = height;
+    td.tex_t  = width;
+    td.tex_u  = height;
+    td.textureTarget    = GL_TEXTURE_RECTANGLE_ARB;
+    td.glInternalFormat = GL_RGBA;
+    outTex.allocate(td);
+}
+
+void GstHwImpl::configureBlit() {
+    ofTextureData td;
+    td.width  = width;
+    td.height = height;
+    td.tex_w  = width;
+    td.tex_h  = height;
+    td.tex_t  = 1.0f;
+    td.tex_u  = 1.0f;
+    td.textureTarget    = GL_TEXTURE_2D;
+    td.glInternalFormat = GL_RGBA;
+    srcTex2D.allocate(td);
+
+    ofFbo::Settings s;
+    s.width          = width;
+    s.height         = height;
+    s.internalformat = GL_RGBA;
+    s.textureTarget  = GL_TEXTURE_RECTANGLE_ARB;
+    s.useDepth       = false;
+    blitFbo.allocate(s);
+
+    blitShader.setupShaderFromSource(GL_VERTEX_SHADER,   BLIT_VERT);
+    blitShader.setupShaderFromSource(GL_FRAGMENT_SHADER, BLIT_FRAG);
+    blitShader.linkProgram();
+    blitReady = true;
+}
+
+void GstHwImpl::load(const std::string& path) {
+    teardown();
+    ensureGstInit();
+    ensureGlBridge();
+
+    sourcePath = path;
+
+    if (tryBuild(path, "rectangle")) {
+        mode = Mode::RectDirect;
+        configureRectTex();
+        ofLogNotice("LpmtVideoPlayer")
+            << path << ": hw decode rectangle-direct " << width << "x" << height;
+    } else if (tryBuild(path, "2D")) {
+        mode = Mode::TwoDBlit;
+        configureBlit();
+        ofLogNotice("LpmtVideoPlayer")
+            << path << ": hw decode 2D+blit " << width << "x" << height;
+    } else {
+        ofLogError("LpmtVideoPlayer") << path << ": pipeline build failed";
+        return;
+    }
+    loaded  = true;
+    paused  = false;
+    playing = false;
+}
+
+void GstHwImpl::teardown() {
+    if (pipeline) {
+        gst_element_set_state(pipeline, GST_STATE_NULL);
+        gst_object_unref(pipeline);
+        pipeline = nullptr;
+        sink = nullptr;
+    }
+    {
+        std::lock_guard<std::mutex> lk(heldMx);
+        if (held) { gst_sample_unref(held); held = nullptr; }
+        newSample.store(false, std::memory_order_release);
+    }
+    loaded = false; playing = false; paused = false;
+    width = height = 0;
+    blitReady = false;
+}
+
+void GstHwImpl::seekSegment(bool flush) {
+    if (!pipeline) return;
+    GstSeekFlags flags = GstSeekFlags(GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_KEY_UNIT);
+    if (flush) flags = GstSeekFlags(flags | GST_SEEK_FLAG_FLUSH);
+    gst_element_seek(pipeline, rate, GST_FORMAT_TIME, flags,
+        GST_SEEK_TYPE_SET, 0,
+        GST_SEEK_TYPE_SET, GST_CLOCK_TIME_NONE);
+}
+
+void GstHwImpl::play() {
+    if (!pipeline) return;
+    if (loopMode == OF_LOOP_NORMAL) {
+        seekSegment(true);
+    } else {
+        gst_element_seek_simple(pipeline, GST_FORMAT_TIME,
+            GstSeekFlags(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT), 0);
+    }
+    gst_element_set_state(pipeline, GST_STATE_PLAYING);
+    playing = true;
+    paused  = false;
+}
+
+void GstHwImpl::stop() {
+    if (!pipeline) return;
+    gst_element_set_state(pipeline, GST_STATE_PAUSED);
+    playing = false;
+}
+
+void GstHwImpl::setPaused(bool p) {
+    if (!pipeline) return;
+    gst_element_set_state(pipeline, p ? GST_STATE_PAUSED : GST_STATE_PLAYING);
+    paused = p;
+}
+
+void GstHwImpl::setSpeed(float s) {
+    if (s == 0.0f) return;
+    rate = s;
+    if (pipeline && loopMode == OF_LOOP_NORMAL) seekSegment(true);
+}
+
+void GstHwImpl::setPosition(float pct) {
+    if (!pipeline) return;
+    gint64 dur = GST_CLOCK_TIME_NONE;
+    if (!gst_element_query_duration(pipeline, GST_FORMAT_TIME, &dur) || dur <= 0) return;
+    gint64 pos = (gint64)((double)pct * (double)dur);
+    gst_element_seek_simple(pipeline, GST_FORMAT_TIME,
+        GstSeekFlags(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT), pos);
+}
+
+void GstHwImpl::update() {
+    if (!pipeline) return;
+    GstBus* bus = gst_element_get_bus(pipeline);
+    GstMessage* msg = nullptr;
+    while ((msg = gst_bus_pop_filtered(bus,
+             GstMessageType(GST_MESSAGE_SEGMENT_DONE | GST_MESSAGE_EOS | GST_MESSAGE_ERROR))) != nullptr) {
+        switch (GST_MESSAGE_TYPE(msg)) {
+        case GST_MESSAGE_SEGMENT_DONE:
+            if (loopMode == OF_LOOP_NORMAL) seekSegment(false);
+            break;
+        case GST_MESSAGE_EOS:
+            if (loopMode == OF_LOOP_NORMAL) seekSegment(true);
+            else playing = false;
+            break;
+        case GST_MESSAGE_ERROR: {
+            GError* e = nullptr; gchar* d = nullptr;
+            gst_message_parse_error(msg, &e, &d);
+            ofLogError("LpmtVideoPlayer") << (e ? e->message : "?") << " | " << (d ? d : "");
+            if (e) g_error_free(e);
+            g_free(d);
+            playing = false;
+            break;
+        }
+        default: break;
+        }
+        gst_message_unref(msg);
+    }
+    gst_object_unref(bus);
+}
+
+ofTexture& GstHwImpl::getTexture() {
+    if (newSample.exchange(false, std::memory_order_acq_rel)) {
+        GstSample* s = nullptr;
+        {
+            std::lock_guard<std::mutex> lk(heldMx);
+            if (held) { s = held; gst_sample_ref(s); }
+        }
+        if (s) {
+            GstBuffer* buf = gst_sample_get_buffer(s);
+            GstMemory* mem = gst_buffer_peek_memory(buf, 0);
+            if (mem && gst_is_gl_memory(mem)) {
+                GstGLMemory* glmem = (GstGLMemory*)mem;
+                GLuint id = glmem->tex_id;
+                if (mode == Mode::RectDirect) {
+                    outTex.setUseExternalTextureID(id);
+                } else if (blitReady) {
+                    srcTex2D.setUseExternalTextureID(id);
+                    blitFbo.begin();
+                    ofClear(0);
+                    blitShader.begin();
+                    blitShader.setUniformTexture("src", srcTex2D, 0);
+                    blitShader.setUniform1i("flipY", needsFlipY ? 1 : 0);
+                    ofDrawRectangle(0, 0, (float)width, (float)height);
+                    blitShader.end();
+                    blitFbo.end();
+                }
+            }
+            gst_sample_unref(s);
+        }
+    }
+    return (mode == Mode::RectDirect) ? outTex : blitFbo.getTexture();
+}
+
+void GstHwImpl::draw(float x, float y, float w, float h) {
+    getTexture().draw(x, y, w, h);
+}
+
+}
+
+std::shared_ptr<LpmtVideoPlayer::Impl> makeLpmtVideoPlayerImpl() {
+    return std::make_shared<GstHwImpl>();
+}
+
+#endif

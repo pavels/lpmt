@@ -58,7 +58,7 @@ void ofApp::setup()
     // shared videos setup
     sharedVideos.clear();
     for (int i = 0; i < MAX_SHARED_VIDEOS; i++) {
-        ofVideoPlayer video;
+        LpmtVideoPlayer video;
         sharedVideos.push_back(video);
         sharedVideosFiles.push_back("");
     }

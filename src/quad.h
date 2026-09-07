@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "LpmtVideoPlayer.h"
 
 //#define WITH_KINECT
 
@@ -20,8 +21,8 @@ public:
     void reset();
     void setup(ofPoint point1, ofPoint point2, ofPoint point3, ofPoint point4, ofShader& edgeBlendShader, ofShader& quadMaskShader, ofShader& surfaceShader, ofShader& fadeShader, vector<ofVideoGrabber>& cameras, ofTrueTypeFont& font);
     void update();
-    void draw(vector<ofVideoPlayer>& sharedVideos);
-    void drawSurface(vector<ofVideoPlayer>& sharedVideos);
+    void draw(vector<LpmtVideoPlayer>& sharedVideos);
+    void drawSurface(vector<LpmtVideoPlayer>& sharedVideos);
     void drawDeformation(ofTexture& tex, bool alphaFix);
     void applyBlendmode();
 
@@ -43,8 +44,8 @@ public:
     void bezierSurfaceSetup();
     void bezierSurfaceUpdate();
     //int getdir (string dir, vector<string> &files); // a func for reading a dir content to a vector of strings
-    bool isValidContent(vector<ofVideoPlayer>& sharedVideos);
-    void drawContent(float w, float h, vector<ofVideoPlayer>& sharedVideos);
+    bool isValidContent(vector<LpmtVideoPlayer>& sharedVideos);
+    void drawContent(float w, float h, vector<LpmtVideoPlayer>& sharedVideos);
 
 #ifdef WITH_KINECT
     void setKinect(kinectManager* kinect);
@@ -66,7 +67,7 @@ public:
 
     /* img and video stuff */
     ofImage img;
-    ofVideoPlayer video;
+    LpmtVideoPlayer video;
     ofTexture blank;
     ofTrueTypeFont ttf;
 
