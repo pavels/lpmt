@@ -292,6 +292,28 @@ void ofApp::deleteQuad()
 }
 
 //---------------------------------------------------------------
+void ofApp::deleteAllQuads()
+{
+    for (int i = 0; i < MAX_QUADS; i++) {
+        if (!quads[i].initialized) {
+            continue;
+        }
+
+        if (timelineHasQuadPage(i)) {
+            timelineRemoveQuadPage(i);
+        }
+        if ((quads[i].layer >= 0) && (quads[i].layer < MAX_QUADS)) {
+            layers[quads[i].layer] = -1;
+        }
+        quads[i].reset();
+    }
+    nOfQuads = countInitializedQuads();
+
+    // next line fixes a bug i've been tracking down for a looong time
+    glDisable(GL_DEPTH_TEST);
+}
+
+//---------------------------------------------------------------
 void ofApp::activateNextQuad()
 {
     if (!isEditMode) {

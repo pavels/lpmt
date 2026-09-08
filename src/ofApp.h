@@ -3,6 +3,9 @@
 #define MAX_QUADS 36
 #define MAX_SHARED_VIDEOS 8
 
+// project file loaded on autostart and written by CTRL-s
+#define DEFAULT_PROJECT_FILE "_lpmt_settings.xml"
+
 //#define WITH_KINECT
 #define WITH_MIDI
 #ifdef TARGET_OSX
@@ -72,6 +75,7 @@ public:
 
     void addQuad();
     void deleteQuad();
+    void deleteAllQuads();
     void copyQuadSettings(int sourceQuad);
     void activateNextQuad();
     void activatePrevQuad();

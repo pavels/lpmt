@@ -5,12 +5,26 @@ KEY COMMANDS:
 
 'a' - adds new quad
 'CTRL-x' - delete selected quad
+'CTRL-SHIFT-x' - delete all quads
 '>' - go to next quad
 '<' - go to previous quad
 '+' - raise active quad position in layers pile
 '-' - lower active quad position in layers pile
 'q' - fills window with active quad
 '1' - shows general settings page of gui
+
+CORNER EDITING WITH ARROW KEYS:
+(only in setup mode with the gui hidden - press 'g' - and not while
+ mask-editing 'm' or bezier/grid-editing 'b' are active)
+
+'CTRL-arrow' - select the corner in that direction
+
+     0 ---- 1
+     |      |
+     3 ---- 2
+
+'arrow' - move the selected corner by one pixel
+'SHIFT-arrow' - move the selected corner by ten pixels
 
 'g' - toggles gui (for quad warping with mouse gui must be switched off)
 'f' - toggles fullscreen mode
@@ -31,4 +45,5 @@ KEY COMMANDS:
 'F10'    - toggles timeline interface
 'F11'    - toggles stage visibility under timeline
 'F12'    - play/stop timeline
+'CTRL-s' - saves the project to _lpmt_settings.xml (the file loaded at startup)
 'CTRL-q' - Quits the application

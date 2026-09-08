@@ -112,7 +112,7 @@ void ofApp::parseOsc()
     // load
     else if ( m.getAddress() == "/projection/load" )
     {
-        loadSettingsFromXMLFile("_lpmt_settings.xml");
+        loadSettingsFromXMLFile(DEFAULT_PROJECT_FILE);
         m_gui.updatePages(quads[activeQuad]);
         m_gui.showPage(2);
     }
