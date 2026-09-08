@@ -18,11 +18,6 @@ CORNER EDITING WITH ARROW KEYS:
  mask-editing 'm' or bezier/grid-editing 'b' are active)
 
 'CTRL-arrow' - select the corner in that direction
-
-     0 ---- 1
-     |      |
-     3 ---- 2
-
 'arrow' - move the selected corner by one pixel
 'SHIFT-arrow' - move the selected corner by ten pixels
 
