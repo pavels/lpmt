@@ -33,7 +33,7 @@ void quad::reset()
     sharedVideoId = sharedVideoNum - 1;
     slideshowBg = false;
     bFadeTransitions = false;
-    imageFit = false;
+    imageFit = true;
     imageKeepAspect = false;
     bUseGreenscreen = false;
 
