@@ -24,7 +24,6 @@ void ofApp::exit()
 //--------------------------------------------------------------
 void ofApp::setup()
 {
-    //ofDisableAntiAliasing();
     ofSetVerticalSync(true);
     ofSetEscapeQuitsApp(false);
     autoStart = false;
@@ -115,7 +114,6 @@ void ofApp::setup()
     // setup shaders
     edgeBlendShader.load("shaders/blend.vert", "shaders/blend.frag");
     quadMaskShader.load("shaders/mask.vert", "shaders/mask.frag");
-    //chromaShader.load("shaders/chroma.vert", "shaders/chroma.frag");
     surfaceShader.load("shaders/surface.vert", "shaders/surface.frag");
     crossfadeShader.load("shaders/crossfade.vert", "shaders/crossfade.frag");
 
@@ -126,7 +124,6 @@ void ofApp::setup()
     bSnapOn = true; // snap mode for surfaces corner is on
     m_sourceQuadForCopying = -1; // number of surface to use as source in copy/paste (per default no quad is selected)
     m_isSnapshotTextureOn = false; // snapshot background texture is turned off by default
-    //bMpe = false;  // default is not using MostPixelsEver
     bFullscreen = 0; // starts in windowed mode
     bGui = 1; // gui is on at start
 
@@ -173,21 +170,6 @@ void ofApp::setup()
     }
 
     ofSetWindowTitle("LPMT");
-}
-
-//--------------------------------------------------------------
-void ofApp::mpeSetup()
-{
-    //    stopProjection();
-    //    bMpe = true;
-    //    // MPE stuff
-    //    lastFrameTime = ofGetElapsedTimef();
-    //    client.setup("mpe_client_settings.xml", true); //false means you can use backthread
-    //    ofxMPERegisterEvents(this);
-    //    //resync();
-    //    startProjection();
-    //    client.start();
-    //    ofSetBackgroundAuto(false);
 }
 
 //--------------------------------------------------------------
@@ -339,22 +321,6 @@ void ofApp::prepare()
             if (idx >= 0) {                
                 if (quads[idx].initialized) {
                     quads[idx].update();
-                    // frame delay correction for Mpe sync
-                    //                    if(bMpe)
-                    //                    {
-                    //                        if(quads[idx].videoBg && quads[idx].video.isLoaded())
-                    //                        {
-                    //                            int mpeFrame = client.getFrameCount();
-                    //                            int totFrames = quads[idx].video.getTotalNumFrames();
-                    //                            int videoFrame = quads[idx].video.getCurrentFrame();
-                    //                            //quads[idx].video.setFrame(mpeFrame%totFrames);
-                    //                            if(abs((mpeFrame%totFrames) - videoFrame) > 2) // TODO: testing different values
-                    //                            {
-                    //                                //cout << mpeFrame%totFrames << endl;
-                    //                                quads[idx].video.setFrame(mpeFrame%totFrames);
-                    //                            }
-                    //                        }
-                    //                    }
                 }
             }
         }
@@ -388,16 +354,13 @@ void ofApp::render()
 //--------------------------------------------------------------
 void ofApp::update()
 {
-    //if (!bMpe)
-    {
-        if (m_isSplashScreenActive) {
-            // turn the splash screen image of after 3 seconds
-            if (ofGetElapsedTimef() > 3.f) {
-                m_isSplashScreenActive = !m_isSplashScreenActive;
-            }
+    if (m_isSplashScreenActive) {
+        // turn the splash screen image of after 3 seconds
+        if (ofGetElapsedTimef() > 3.f) {
+            m_isSplashScreenActive = !m_isSplashScreenActive;
         }
-        prepare();
     }
+    prepare();
     
     if (fullscreenDelayFrames > 0) {
 	fullscreenDelayFrames--;
@@ -412,10 +375,7 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-    //if (!bMpe)
-    {
-        render();
-    }
+    render();
 
     if (isEditMode) {
         if (bStarted) {
@@ -445,16 +405,6 @@ void ofApp::draw()
                 ofSetHexColor(0xFF0000);
                 ttf.drawString("Mask-editing mode ", 170, ofGetHeight() - 25);
             }
-            if (bMidiHotkeyCoupling) {
-                if (bMidiHotkeyLearning) {
-                    ofSetColor(255, 255, 0);
-                    ttf.drawString("waiting for MIDI or OSC message ", 170, ofGetHeight() - 25);
-                } else {
-                    ofSetColor(255, 0, 0);
-                    ttf.drawString("MIDI or OSC hotkey coupling ", 170, ofGetHeight() - 25);
-                }
-                ofDrawRectangle(2, 2, ofGetWidth() - 4, ofGetHeight() - 4);
-            }
             // draws gui
             m_gui.draw();
         }
@@ -475,49 +425,6 @@ void ofApp::draw()
     if (bGui) {
         ofSetColor(255, 255, 255);
         ofDrawBitmapString(ofToString(ofGetFrameRate()), ofGetWidth() - 100, ofGetHeight() - 30);
-    }
-}
-
-//--------------------------------------------------------------
-//void ofApp::mpeFrameEvent(ofxMPEEventArgs& event)
-//{
-//    if (bMpe)
-//    {
-//        if(client.getFrameCount()<=1)
-//        {
-//            resync();
-//        }
-//        prepare();
-//        render();
-//    }
-//}
-
-//--------------------------------------------------------------
-//void ofApp::mpeMessageEvent(ofxMPEEventArgs& event)
-//{
-//    //received a message from the server
-//}
-
-//void ofApp::mpeResetEvent(ofxMPEEventArgs& event)
-//{
-//    //triggered if the server goes down, another client goes offline, or a reset was manually triggered in the server code
-//}
-
-//--------------------------------------------------------------
-void ofApp::keyPressed(int key)
-{
-    if(m_loadProjectFlag || m_saveProjectFlag) return;
-
-
-    if (bMidiHotkeyCoupling) {
-        bMidiHotkeyLearning = true;
-        midiHotkeyPressed = key;
-    }
-
-    if (key == OF_KEY_F5) {
-        bMidiHotkeyCoupling = !bMidiHotkeyCoupling;
-        bMidiHotkeyLearning = false;
-        midiHotkeyPressed = -1;
     }
 }
 
@@ -690,16 +597,7 @@ void ofApp::keyPressed(ofKeyEventArgs& args)
         toggleEditMode();
     } else if ((args.key == 'f' || args.key == 'F') && !bTimeline) // toggles fullscreen mode
     {
-        bFullscreen = !bFullscreen;
-        if (!bFullscreen) {
-            ofSetWindowShape(default_window_width, default_window_height);
-            ofSetFullscreen(false);
-            int screenW = ofGetScreenWidth();
-            int screenH = ofGetScreenHeight();
-            ofSetWindowPosition(screenW / 2 - default_window_width / 2, screenH / 2 - default_window_height / 2);
-        } else {
-            ofSetFullscreen(true);
-        }
+        setFullscreen(!bFullscreen);
     } else if ((args.key == 'g' || args.key == 'G') && !bTimeline) // toggles gui
     {
         if (maskSetup) {
@@ -1212,13 +1110,6 @@ void ofApp::quadBezierSpherize(int q)
             }
         }
     }
-    /*  quads[q].bezierPoints =
-    {
-        {   {(0.5f*w/h-0.5f)*h/w, 0, 0},  {0.5f*(k+w/h-1)*h/w, -0.5f*k, 0},    {0.5f*(1-k+w/h)*h/w, -0.5f*k, 0},    {1.0*h/w+(0.5f*(w/h-1))*h/w, 0, 0}    },
-        {   {0*h/w-(0.5f*k*h/w)+(0.5f*(w/h-1))*h/w, 0.5f*k, 0},        {0*h/w+(0.5f*(w/h-1))*h/w, 0, 0},  {1.0*h/w+(0.5f*(w/h-1))*h/w, 0, 0},  {1.0*h/w+(0.5f*k*h/w)+(0.5f*(w/h-1))*h/w, 0.5f*k, 0}  },
-        {   {0*h/w-(0.5f*k*h/w)+(0.5f*(w/h-1))*h/w, 1.0-0.5f*k, 0},        {0*h/w+(0.5f*(w/h-1))*h/w, 1.0, 0},  {1.0*h/w+(0.5f*(w/h-1))*h/w, 1.0, 0},  {1.0*h/w+(0.5f*k*h/w)+(0.5f*(w/h-1))*h/w, 1.0-0.5f*k, 0}  },
-        {   {0*h/w+(0.5f*(w/h-1))*h/w, 1.0, 0},        {0.5f*k*h/w+(0.5f*(w/h-1))*h/w, 1.0+0.5f*k, 0},  {(1.0*h/w)-(0.5f*k*h/w)+(0.5f*(w/h-1))*h/w, 1.0+0.5f*k, 0},  {1.0*h/w+(0.5f*(w/h-1))*h/w, 1.0, 0}  }
-    }; */
 }
 
 //---------------------------------------------------------------
@@ -1429,7 +1320,6 @@ void ofApp::setupCameras()
     // check how many cameras are defined in settings
     int numberOfCameras = 0;
     numberOfCameras = xmlConfigFile.getNumTags("camera");
-    //m_cameras.reserve(numberOfCameras); // reserve memory, so the iterators don't get invalidated by reallocation
 
     // cycle through defined cameras trying to initialize them and populate the cameras vector
     for (int i = 0; i < numberOfCameras; i++) {
@@ -1504,8 +1394,6 @@ void ofApp::setupOSC()
     oscControlMax = xmlConfigFile.getValue("OSC:GUI_CONTROL:SLIDER:MAX", 1.0f);
     ofLogNotice() << "osc control of gui sliders range: min=" << oscControlMin << " - max=" << oscControlMax;
 
-    oscHotkeyMessages.clear();
-    oscHotkeyKeys.clear();
 }
 
 //--------------------------------------------------------------
@@ -1515,26 +1403,50 @@ void ofApp::setupMidi()
     // print input ports to console
     midiIn.listInPorts();
 
-    // open port by number
-    //midiIn.openPort(1);
-    //midiIn.openPort("IAC Pure Data In");	// by name
-    midiIn.openVirtualPort("LPMT Input"); // open a virtual port
+    string requestedPort = "";
+    bool useVirtualPort = true;
+    if (bWasConfigLoadSuccessful && xmlConfigFile.tagExists("midi")) {
+        xmlConfigFile.pushTag("midi");
+        requestedPort = xmlConfigFile.getValue("port", "");
+        useVirtualPort = xmlConfigFile.getValue("virtualPort", 1);
+        xmlConfigFile.popTag();
+    }
 
-    // don't ignore sysex, timing, & active sense messages,
-    // these are ignored by default
-    midiIn.ignoreTypes(false, false, false);
-    // add ofApp as a listener
-    midiIn.addListener(this);
-    // print received messages to the console
-    midiIn.setVerbose(true);
-    //clear vectors used for midi-hotkeys coupling
-    midiHotkeyMessages.clear();
-    midiHotkeyKeys.clear();
+    if (requestedPort != "") {
+        // a port is addressed either by its index in the list printed above, or by (part of) its name
+        const bool isPortIndex = (requestedPort.find_first_not_of("0123456789") == string::npos);
+        bool wasPortOpened = false;
+        if (isPortIndex) {
+            const int portIndex = ofToInt(requestedPort);
+            if ((portIndex >= 0) && (portIndex < midiIn.getNumInPorts())) {
+                wasPortOpened = midiIn.openPort(portIndex);
+            }
+        } else {
+            wasPortOpened = midiIn.openPort(requestedPort);
+        }
+
+        if (wasPortOpened) {
+            ofLogNotice("LPMT") << "Opened MIDI input port \"" << midiIn.getName() << "\"";
+            midiIn.ignoreTypes(false, false, false);
+            midiIn.addListener(this);
+            midiIn.setVerbose(true);
+        } else {
+            ofLogError("LPMT") << "Could not open MIDI input port \"" << requestedPort << "\" - check the port list above.";
+        }
+    }
+
+    if (useVirtualPort) {
+        if (midiInVirtual.openVirtualPort("LPMT Input")) {
+            ofLogNotice("LPMT") << "Opened virtual MIDI input port \"LPMT Input\"";
+            midiInVirtual.ignoreTypes(false, false, false);
+            midiInVirtual.addListener(this);
+            midiInVirtual.setVerbose(true);
+        } else {
+            ofLogError("LPMT") << "Could not open the virtual MIDI input port.";
+        }
+    }
 #endif
 
-    bMidiHotkeyCoupling = false;
-    bMidiHotkeyLearning = false;
-    midiHotkeyPressed = -1;
 }
 
 //--------------------------------------------------------------

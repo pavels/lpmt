@@ -299,7 +299,6 @@ void quad::update()
             }
             // turn it on again for drawing
             // update fps
-            //if (abs(fps-ofGetFrameRate()) > 50) {fps = ofGetFrameRate();}
             slideFramesDuration = (slideshowSpeed * fps);
             slideshowBg = true;
         }
@@ -323,7 +322,6 @@ void quad::update()
                 poly.close();
                 poly.simplify(kinectContourSimplify);
                 ofPolyline polySmoothed = poly.getSmoothed(kinectContourSmooth);
-                //polySmoothed.close();
                 vector<glm::vec3> points = polySmoothed.getVertices();
 
                 for (size_t j = 0; j < points.size(); j++) {
@@ -391,7 +389,6 @@ void quad::draw(vector<LpmtVideoPlayer>& sharedVideos)
         ofClear(0.0, 0.0, 0.0, 0.0);
         ofEnableAlphaBlending();
         ofFill();
-        //ofEnableSmoothing();
 
         // crop rectangular mask
         ofSetColor(255, 255, 255);
@@ -435,7 +432,6 @@ void quad::draw(vector<LpmtVideoPlayer>& sharedVideos)
             }
         }
 #endif
-        //ofDisableSmoothing();
         ofNoFill();
         ofDisableAlphaBlending();
         ofPopStyle();
@@ -614,10 +610,8 @@ void quad::draw(vector<LpmtVideoPlayer>& sharedVideos)
                 }
                 ofSetHexColor(0x444444); // dark-grey
                 ofSetLineWidth(3);
-                //ofEnableSmoothing();
                 contour.close();
                 contour.draw();
-                //ofDisableSmoothing();
                 ofPopStyle();
             }
         }
@@ -728,8 +722,6 @@ void quad::drawDeformation(ofTexture& tex, bool bAlphaFix)
             glScalef(tex.getWidth() / texData.tex_w, tex.getHeight() / texData.tex_h, 1.0f);
         }
         glMatrixMode(GL_MODELVIEW);
-        //        glEnable(GL_MAP2_VERTEX_3);
-        //        glEnable(GL_AUTO_NORMAL);
 
         if (bAlphaFix) {
             // this tries to prevent the double alpha problem
@@ -744,8 +736,6 @@ void quad::drawDeformation(ofTexture& tex, bool bAlphaFix)
             glDisable(GL_BLEND);
         }
 
-        //        glDisable(GL_MAP2_VERTEX_3);
-        //        glDisable(GL_AUTO_NORMAL);
 
         tex.unbind();
         glMatrixMode(GL_TEXTURE);
@@ -1588,10 +1578,8 @@ void quad::drawMaskMarkers()
         }
         ofSetHexColor(0x444444); // dark-grey
         ofSetLineWidth(1.6);
-        //ofEnableSmoothing();
         contour.close();
         contour.draw();
-        //ofDisableSmoothing();
 
         // draw the marker handles
         for (size_t i = 0; i < m_maskPoints.size(); i++) {

@@ -52,7 +52,6 @@ public:
     void update();
     void draw();
     void keyPressed(ofKeyEventArgs& args);
-    void keyPressed(int key);
     void keyReleased(int key);
     void mouseMoved(int x, int y );
     void mouseDragged(int x, int y, int button);
@@ -68,7 +67,6 @@ public:
     void setupMidi();
     void setupSyphon();
     void setupKinect();
-    void mpeSetup();
     void resync();
     void startProjection();
     void stopProjection();
@@ -99,6 +97,10 @@ public:
     void raiseLayer();
     void lowerLayer();
     void toggleEditMode();
+    void setEditMode(bool wanted);
+    void setMaskSetup(bool wanted);
+    void setFullscreen(bool wanted);
+    void setTimelineVisible(bool wanted);
     void saveCurrentSettingsToXMLFile(std::string xmlFilePath);
     void loadSettingsFromXMLFile(std::string xmlFilePath);
     ofImage loadImageFromFile(); // snapshot loading
@@ -144,13 +146,10 @@ public:
     float timers[NUM_MSG_STRINGS];
     float oscControlMin;
     float oscControlMax;
-    vector<ofxOscMessage> oscHotkeyMessages;
-    vector<int> oscHotkeyKeys;
 
     // Shaders
     ofShader edgeBlendShader;
     ofShader quadMaskShader;
-    //ofShader chromaShader;
     ofShader surfaceShader;
     ofShader crossfadeShader;
 
@@ -175,9 +174,6 @@ public:
     bool m_bezierSpherizeQuadFlag;
     bool m_bezierSpherizeQuadStrongFlag;
     bool m_bezierResetQuadFlag;
-    bool bMidiHotkeyCoupling;
-    bool bMidiHotkeyLearning;
-    int midiHotkeyPressed;
 
     float m_totalRotationAngle;
     ofPolyline m_rotationSector;
@@ -231,20 +227,9 @@ public:
     #ifdef WITH_MIDI
     void newMidiMessage(ofxMidiMessage& eventArgs);
     ofxMidiIn midiIn;
+    ofxMidiIn midiInVirtual;
     ofxMidiMessage midiMessage;
-    vector<ofxMidiMessage> midiHotkeyMessages;
-    vector<int> midiHotkeyKeys;
     #endif
-
-    // MostPixelsEver stuff
-    /*
-    bool bMpe;
-    ofxMPEClient client;
-    void mpeFrameEvent(ofxMPEEventArgs& event);
-    void mpeMessageEvent(ofxMPEEventArgs& event);
-    void mpeResetEvent(ofxMPEEventArgs& event);
-    float lastFrameTime;
-    */
 
     int fullscreenDelayFrames = 0;
 };

@@ -225,7 +225,6 @@ void GUI::setupPages()
     m_gui.addSlider("radius", m_dummyFloat, 0, 2.0);
 
     // then we set displayed gui page to the one corresponding to active quad and show the gui
-//    m_gui.setPage((activeQuad*3)+2);
     m_gui.show();
 }
 

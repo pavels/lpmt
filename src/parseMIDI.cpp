@@ -20,41 +20,6 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
 	cout << "value: " << midiMessage.value << endl;
 	*/
 
-	if(bMidiHotkeyCoupling && midiHotkeyPressed >= 0)
-    {
-        if(midiHotkeyMessages.size()>0 && midiHotkeyMessages.size() == midiHotkeyKeys.size())
-        {
-        for(int i=0; i < midiHotkeyMessages.size(); i++)
-        {
-            if(midiHotkeyKeys[i] == midiHotkeyPressed)
-            {
-                midiHotkeyKeys.erase(midiHotkeyKeys.begin()+i);
-                midiHotkeyMessages.erase(midiHotkeyMessages.begin()+i);
-                --i;
-            }
-        }
-        }
-        midiHotkeyMessages.push_back(midiMessage);
-        midiHotkeyKeys.push_back(midiHotkeyPressed);
-        midiHotkeyPressed = -1;
-        bMidiHotkeyCoupling = false;
-        bMidiHotkeyLearning = false;
-        return;
-    }
-
-	if(midiHotkeyMessages.size()>0 && midiHotkeyMessages.size() == midiHotkeyKeys.size())
-    {
-        for(int i=0; i < midiHotkeyMessages.size(); i++)
-        {
-            ofxMidiMessage midiControl = midiHotkeyMessages[i];
-            if(midiMessage.velocity >0 && midiMessage.status == midiControl.status && midiMessage.pitch == midiControl.pitch && midiMessage.channel == midiControl.channel)
-            {
-                keyPressed(midiHotkeyKeys[i]);
-            }
-        }
-    }
-
-
 	for(int i=0; i < m_gui.getPages().size(); i++)
 	{
 	    for(int j=0; j < m_gui.getPages()[i]->getControls().size(); j++)
@@ -155,13 +120,11 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
                                 if(m_gui.getPages()[i]->getControls()[j]->controlType == "SliderFloat")
                                 {
                                     ofxSimpleGuiSliderFloat *s = (ofxSimpleGuiSliderFloat *) m_gui.getPages()[i]->getControls()[j];
-                                    //s->decrease();
                                     s->setValue(s->getValue()-(s->max - s->min)*0.002);
                                 }
                                 else
                                 {
                                     ofxSimpleGuiSliderInt *s = (ofxSimpleGuiSliderInt *) m_gui.getPages()[i]->getControls()[j];
-                                    //s->decrease();
                                     s->setValue(s->getValue()-1);
                                 }
                            }
@@ -170,13 +133,11 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
                                 if(m_gui.getPages()[i]->getControls()[j]->controlType == "SliderFloat")
                                 {
                                     ofxSimpleGuiSliderFloat *s = (ofxSimpleGuiSliderFloat *) m_gui.getPages()[i]->getControls()[j];
-                                    //s->increase();
                                     s->setValue(s->getValue()+(s->max - s->min)*0.002);
                                 }
                                 else
                                 {
                                     ofxSimpleGuiSliderInt *s = (ofxSimpleGuiSliderInt *) m_gui.getPages()[i]->getControls()[j];
-                                    //s->increase();
                                     s->setValue(s->getValue()+1);
                                 }
                            }

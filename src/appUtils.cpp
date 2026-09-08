@@ -292,6 +292,65 @@ void ofApp::deleteQuad()
 }
 
 //---------------------------------------------------------------
+void ofApp::setEditMode(bool wanted)
+{
+    isEditMode = wanted;
+    for (int i = 0; i < MAX_QUADS; i++) {
+        if (quads[i].initialized) {
+            quads[i].isEditMode = wanted;
+        }
+    }
+}
+
+//---------------------------------------------------------------
+void ofApp::setMaskSetup(bool wanted)
+{
+    if (bGui) {
+        return;
+    }
+
+    maskSetup = wanted;
+    for (int i = 0; i < MAX_QUADS; i++) {
+        if (quads[i].initialized) {
+            quads[i].isMaskSetup = wanted;
+        }
+    }
+}
+
+//---------------------------------------------------------------
+void ofApp::setFullscreen(bool wanted)
+{
+    bFullscreen = wanted;
+    if (wanted) {
+        ofSetFullscreen(true);
+    } else {
+        ofSetWindowShape(default_window_width, default_window_height);
+        ofSetFullscreen(false);
+        const int screenW = ofGetScreenWidth();
+        const int screenH = ofGetScreenHeight();
+        ofSetWindowPosition(screenW / 2 - default_window_width / 2, screenH / 2 - default_window_height / 2);
+    }
+}
+
+//---------------------------------------------------------------
+void ofApp::setTimelineVisible(bool wanted)
+{
+    if (wanted == bTimeline) {
+        return;
+    }
+
+    bTimeline = wanted;
+    timeline.toggleShow();
+    if (bTimeline) {
+        timeline.enable();
+        m_gui.hide();
+        bGui = false;
+    } else {
+        timeline.disable();
+    }
+}
+
+//---------------------------------------------------------------
 void ofApp::deleteAllQuads()
 {
     for (int i = 0; i < MAX_QUADS; i++) {

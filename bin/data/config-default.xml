@@ -41,6 +41,19 @@
     </GUI_CONTROL>
 </OSC>
 
+<!-- MIDI input.
+     'port'        - hardware input port to open, given either as an index into the port
+                     list printed to the console at startup, or as part of the port name.
+                     Leave empty to open no hardware port.
+     'virtualPort' - also publish the "LPMT Input" virtual port that other software can
+                     connect to (1 = yes, 0 = no).
+     e.g.  <port>1</port>  or  <port>nanoKONTROL</port>  -->
+
+<midi>
+    <port></port>
+    <virtualPort>1</virtualPort>
+</midi>
+
 <PROJECTION>
 <AUTO>0</AUTO>
 </PROJECTION>

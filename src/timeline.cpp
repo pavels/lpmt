@@ -193,12 +193,6 @@ void ofApp::timelineAddQuadPage(int i) {
     timeline.addCurves("alpha_"+ofToString(i), "timeline/" + ofToString(i)+"_alpha.xml", ofRange(0, 1.0));
     timeline.addFlags("trigger_"+ofToString(i), "timeline/" + ofToString(i)+"_trigger.xml");
     timeline.addColors("colour_"+ofToString(i), "timeline/" + ofToString(i)+"_colour.xml");
-//    timeline.addCurves("red_"+ofToString(i), ofToString(i)+"_red.xml", ofRange(0, 1.0));
-//    timeline.addCurves("green_"+ofToString(i), ofToString(i)+"_green.xml", ofRange(0, 1.0));
-//    timeline.addCurves("blue_"+ofToString(i), ofToString(i)+"_blue.xml", ofRange(0, 1.0));
-//    timeline.addCurves("alpha_"+ofToString(i), ofToString(i)+"_alpha.xml", ofRange(0, 1.0));
-//    timeline.addFlags("trigger_"+ofToString(i), ofToString(i)+"_trigger.xml");
-//    timeline.addColors("colour_"+ofToString(i), ofToString(i)+"_colour.xml");
 }
 
 //--------------------------------------------------------------

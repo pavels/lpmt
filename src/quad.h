@@ -43,7 +43,6 @@ public:
     void gridSurfaceUpdate(bool bRefresh);
     void bezierSurfaceSetup();
     void bezierSurfaceUpdate();
-    //int getdir (string dir, vector<string> &files); // a func for reading a dir content to a vector of strings
     bool isValidContent(vector<LpmtVideoPlayer>& sharedVideos);
     bool hasSharedVideo(vector<LpmtVideoPlayer>& sharedVideos) const;
     bool hasCamera() const;
@@ -234,7 +233,6 @@ public:
 
     bool bGrid;
     vector<vector<vector<float>>> gridPoints;
-    //vector<GLfloat> gridCtrlPoints;
     int gridRows;
     int gridColumns;
     ofMesh gridMesh;
