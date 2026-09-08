@@ -785,7 +785,7 @@ void quad::drawSurface(vector<LpmtVideoPlayer>& sharedVideos)
             srcWidth = img.getWidth();
             srcHeight = img.getHeight();
             imageTex = imageTex2 = img.getTexture();
-        } else if (camAvailable && camBg && cams[camNumber].getWidth() > 0) {
+        } else if (camBg && hasCamera() && cams[camNumber].getWidth() > 0) {
             srcWidth = cams[camNumber].getWidth();
             srcHeight = cams[camNumber].getHeight();
             imageTex = imageTex2 = cams[camNumber].getTexture();
@@ -794,7 +794,7 @@ void quad::drawSurface(vector<LpmtVideoPlayer>& sharedVideos)
             srcHeight = video.getHeight();
             imageTex = imageTex2 = video.getTexture();
 
-        } else if (sharedVideoBg && sharedVideos[sharedVideoId].isLoaded()) {
+        } else if (sharedVideoBg && hasSharedVideo(sharedVideos)) {
             srcWidth = sharedVideos[sharedVideoId].getWidth();
             srcHeight = sharedVideos[sharedVideoId].getHeight();
             imageTex = imageTex2 = sharedVideos[sharedVideoId].getTexture();
@@ -963,17 +963,29 @@ void quad::drawSurface(vector<LpmtVideoPlayer>& sharedVideos)
 }
 
 //--------------------------------------------------------------
+bool quad::hasSharedVideo(vector<LpmtVideoPlayer>& sharedVideos) const
+{
+    return (sharedVideoId >= 0) && (sharedVideoId < (int)sharedVideos.size()) && sharedVideos[sharedVideoId].isLoaded();
+}
+
+//--------------------------------------------------------------
+bool quad::hasCamera() const
+{
+    return camAvailable && (camNumber >= 0) && (camNumber < (int)cams.size());
+}
+
+//--------------------------------------------------------------
 bool quad::isValidContent(vector<LpmtVideoPlayer>& sharedVideos)
 {
     if (colorBg)
         return true;
     else if (imgBg && img.getWidth() > 0)
         return true;
-    else if (camAvailable && camBg && cams[camNumber].getWidth() > 0)
+    else if (camBg && hasCamera() && cams[camNumber].getWidth() > 0)
         return true;
     else if (videoBg && video.isLoaded())
         return true;
-    else if (sharedVideoBg && sharedVideos[sharedVideoId].isLoaded())
+    else if (sharedVideoBg && hasSharedVideo(sharedVideos))
         return true;
     else if (slideshowBg && slides.size() > 0)
         return true;
@@ -988,11 +1000,11 @@ void quad::drawContent(float w, float h, vector<LpmtVideoPlayer>& sharedVideos)
         blank.draw(0, 0, w, h);
     } else if (imgBg && img.getWidth() > 0) {
         img.draw(0, 0, w, h);
-    } else if (camAvailable && camBg && cams[camNumber].getWidth() > 0) {
+    } else if (camBg && hasCamera() && cams[camNumber].getWidth() > 0) {
         cams[camNumber].getTexture().draw(0, 0, w, h);
     } else if (videoBg && video.isLoaded()) {
         video.draw(0, 0, w, h);
-    } else if (sharedVideoBg && sharedVideos[sharedVideoId].isLoaded()) {
+    } else if (sharedVideoBg && hasSharedVideo(sharedVideos)) {
         float x1 = ofGetWidth();
         float y1 = ofGetHeight();
         float x2 = 0.0f;
@@ -1026,6 +1038,9 @@ void quad::drawContent(float w, float h, vector<LpmtVideoPlayer>& sharedVideos)
         }
     } else if (slideshowBg && (slides.size() > 0)) {
 
+        if ((currentSlideId < 0) || (currentSlideId >= (int)slides.size())) {
+            currentSlideId = 0;
+        }
         slides[currentSlideId].draw(0, 0, w, h);
 
         if (slideTimer > slideFramesDuration) {

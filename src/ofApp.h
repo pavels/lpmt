@@ -75,6 +75,9 @@ public:
     void copyQuadSettings(int sourceQuad);
     void activateNextQuad();
     void activatePrevQuad();
+    void setActiveQuad(int index);
+    bool hasActiveQuad() const;
+    int countInitializedQuads() const;
     void quadDimensionsReset(int q);
     void quadPlacementReset(int q);
     void quadBezierSpherize(int q);
@@ -179,7 +182,7 @@ public:
     bool m_isSnapshotTextureOn;
     ofTexture m_snapshotBackgroundTexture;
 	std::vector<ofVideoGrabber> m_cameras;
-	std::vector<ofVideoGrabber>::iterator m_snapshotBackgroundCamera;
+	int m_snapshotBackgroundCamera; // index into m_cameras, -1 when none; an iterator would dangle as the vector grows
 	std::vector<string> m_cameraIds;
 
     vector<LpmtVideoPlayer> sharedVideos;
@@ -203,6 +206,8 @@ public:
     void timelineUpdate();
     void timelineAddQuadPage(int i);
     void timelineRemoveQuadPage(int i);
+    bool timelineHasQuadPage(int i);
+    void timelineSyncQuadPages();
     void timelineTriggerReceived(ofxTLBangEventArgs& trigger);
     bool useTimeline;
 

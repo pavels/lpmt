@@ -45,6 +45,8 @@ public:
     void bezierSurfaceUpdate();
     //int getdir (string dir, vector<string> &files); // a func for reading a dir content to a vector of strings
     bool isValidContent(vector<LpmtVideoPlayer>& sharedVideos);
+    bool hasSharedVideo(vector<LpmtVideoPlayer>& sharedVideos) const;
+    bool hasCamera() const;
     void drawContent(float w, float h, vector<LpmtVideoPlayer>& sharedVideos);
 
 #ifdef WITH_KINECT

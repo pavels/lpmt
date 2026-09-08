@@ -12,7 +12,7 @@ void ofApp::parseOsc()
         int osc_quad = m.getArgAsInt32( 0 );
         int imageId = m.getArgAsInt32( 1 );
 
-        if(imageId == appId) {
+        if((imageId == appId) && (osc_quad >= 0) && (osc_quad < MAX_QUADS) && quads[osc_quad].initialized) {
             ofBuffer buffer = m.getArgAsBlob(2);
             quads[osc_quad].img.load(buffer);
             quads[osc_quad].imgBg = true;
@@ -26,7 +26,9 @@ void ofApp::parseOsc()
         int osc_quad = m.getArgAsInt32( 0 );
         int osc_corner = m.getArgAsInt32( 1 );
         float osc_coord = m.getArgAsFloat( 2 );
-        quads[osc_quad].corners[osc_corner].x = osc_coord;
+        if ((osc_quad >= 0) && (osc_quad < MAX_QUADS) && (osc_corner >= 0) && (osc_corner < 4)) {
+            quads[osc_quad].corners[osc_corner].x = osc_coord;
+        }
     }
     // check for quads corner y movements
     else if ( m.getAddress() == "/corners/y" )
@@ -35,7 +37,9 @@ void ofApp::parseOsc()
         int osc_quad = m.getArgAsInt32( 0 );
         int osc_corner = m.getArgAsInt32( 1 );
         float osc_coord = m.getArgAsFloat( 2 );
-        quads[osc_quad].corners[osc_corner].y = osc_coord;
+        if ((osc_quad >= 0) && (osc_quad < MAX_QUADS) && (osc_corner >= 0) && (osc_corner < 4)) {
+            quads[osc_quad].corners[osc_corner].y = osc_coord;
+        }
     }
 
     // check for active quad corner x movements
@@ -324,13 +328,7 @@ void ofApp::parseOsc()
     {
         // argument is int32
         int osc_activequad = m.getArgAsInt32( 0 );
-        if (osc_activequad <= nOfQuads-1)
-        {
-            quads[activeQuad].isActive = false;
-            activeQuad = osc_activequad;
-            quads[activeQuad].isActive = true;
-            m_gui.updatePages(quads[activeQuad]);
-        }
+        setActiveQuad(osc_activequad);
     }
 
     // on/off
@@ -527,7 +525,7 @@ void ofApp::parseOsc()
     {
         // argument is int32
         int osc_quad_blendMode = m.getArgAsInt32( 0 );
-        if(osc_quad_blendMode < 4)
+        if(osc_quad_blendMode >= 0 && osc_quad_blendMode < 4)
         {
             quads[activeQuad].blendMode = osc_quad_blendMode;
         }

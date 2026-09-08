@@ -51,12 +51,14 @@ void ofApp::setup()
 
     // camera stuff
     m_cameras.clear();
+    m_snapshotBackgroundCamera = -1;
     if (bWasConfigLoadSuccessful) {
         setupCameras();
     }
 
     // shared videos setup
     sharedVideos.clear();
+    sharedVideosFiles.clear();
     for (int i = 0; i < MAX_SHARED_VIDEOS; i++) {
         LpmtVideoPlayer video;
         sharedVideos.push_back(video);
@@ -429,7 +431,11 @@ void ofApp::draw()
 
             // Writes the number of the active quad at the bottom of the window
             ofSetHexColor(0xFFFFFF); // white
-            ttf.drawString("Active surface: " + ofToString(activeQuad) + " Layer: " + ofToString(quads[activeQuad].layer), 30, ofGetHeight() - 25);
+            if (hasActiveQuad()) {
+                ttf.drawString("Active surface: " + ofToString(activeQuad) + " Layer: " + ofToString(quads[activeQuad].layer), 30, ofGetHeight() - 25);
+            } else {
+                ttf.drawString("No active surface", 30, ofGetHeight() - 25);
+            }
             //            for (int i = 0; i < MAX_QUADS; i++) {
             //                int idx = layers[i];
             //                ttf.drawString("layers[" + ofToString(i) + "] = " + ofToString(layers[i]), 600, ofGetHeight() - 600 + i * 20);
@@ -611,15 +617,16 @@ void ofApp::keyPressed(ofKeyEventArgs& args)
         //m_loadProjectFlag = true;
         return;
     } else if (args.key == 'w' && !bTimeline) {
-        if (m_cameras.size() > 0) // if cameras are connected, take a snapshot of the specified camera and uses it as window background
+        if ((m_snapshotBackgroundCamera >= 0) && (m_snapshotBackgroundCamera < (int)m_cameras.size())) // if cameras are connected, take a snapshot of the specified camera and uses it as window background
         {
+            ofVideoGrabber& snapshotCamera = m_cameras[m_snapshotBackgroundCamera];
             m_isSnapshotTextureOn = !m_isSnapshotTextureOn;
             if (m_isSnapshotTextureOn) {
-                const int width = m_snapshotBackgroundCamera->getWidth();
-                const int height = m_snapshotBackgroundCamera->getHeight();
-                m_snapshotBackgroundCamera->update();
+                const int width = snapshotCamera.getWidth();
+                const int height = snapshotCamera.getHeight();
+                snapshotCamera.update();
                 m_snapshotBackgroundTexture.allocate(width, height, GL_RGB);
-                m_snapshotBackgroundTexture.loadData(m_snapshotBackgroundCamera->getPixels().getData(), width, height, GL_RGB);
+                m_snapshotBackgroundTexture.loadData(snapshotCamera.getPixels().getData(), width, height, GL_RGB);
             }
         } else {
             ofLogError() << "Can't take a snapshot background picture. No camera connected.";
@@ -656,8 +663,11 @@ void ofApp::keyPressed(ofKeyEventArgs& args)
         }
     } else if ((args.key == 'd' || args.key == 'D') && !bTimeline) {
         if (maskSetup && quads[activeQuad].m_maskPoints.size() > 0) {
-            if (quads[activeQuad].bHighlightMaskPoint) {
-                quads[activeQuad].m_maskPoints.erase(quads[activeQuad].m_maskPoints.begin() + quads[activeQuad].highlightedMaskPoint);
+            const int highlighted = quads[activeQuad].highlightedMaskPoint;
+            if (quads[activeQuad].bHighlightMaskPoint && (highlighted >= 0) && (highlighted < (int)quads[activeQuad].m_maskPoints.size())) {
+                quads[activeQuad].m_maskPoints.erase(quads[activeQuad].m_maskPoints.begin() + highlighted);
+                quads[activeQuad].bHighlightMaskPoint = false;
+                quads[activeQuad].highlightedMaskPoint = -1;
             }
         }
     } else if ((args.key == OF_KEY_F3) && !bTimeline) // goes to second page of gui for active quad
@@ -796,7 +806,8 @@ void ofApp::keyPressed(ofKeyEventArgs& args)
     } else
 
         if (args.key == '*' && !bTimeline) {
-        if (m_cameras.size() > 0) {
+        const int camNumber = quads[activeQuad].camNumber;
+        if ((camNumber >= 0) && (camNumber < (int)m_cameras.size())) {
 
             if (m_cameras[quads[activeQuad].camNumber].getPixelFormat() == OF_PIXELS_RGBA) {
                 m_cameras[quads[activeQuad].camNumber].setPixelFormat(OF_PIXELS_BGRA);
@@ -940,9 +951,11 @@ void ofApp::mouseMoved(int x, int y)
         }
 
         else if (quads[activeQuad].bGrid) {
-            for (int i = 0; i <= quads[activeQuad].gridRows; i++) {
-                for (int j = 0; j <= quads[activeQuad].gridColumns; j++) {
-                    const ofPoint gridPointInPixel = Util::scalePointToPixel(ofPoint(quads[activeQuad].gridPoints[i][j][0], quads[activeQuad].gridPoints[i][j][1]));
+            // gridPoints is only resized in gridSurfaceUpdate(), which runs a frame behind the row/column sliders
+            const vector<vector<vector<float>>>& gridPoints = quads[activeQuad].gridPoints;
+            for (int i = 0; i < (int)gridPoints.size(); i++) {
+                for (int j = 0; j < (int)gridPoints[i].size(); j++) {
+                    const ofPoint gridPointInPixel = Util::scalePointToPixel(ofPoint(gridPoints[i][j][0], gridPoints[i][j][1]));
                     const ofPoint difference = gridPointInPixel - warpedMousePosition;
                     const float distance = std::sqrt(difference.x * difference.x + difference.y * difference.y);
 
@@ -1047,7 +1060,10 @@ void ofApp::mouseDragged(int x, int y, int button)
         const ofPoint warpedPoint = quads[activeQuad].getWarpedPoint(mousePosition);
         const ofPoint normalizedWarpedPoint = Util::normalizePoint(warpedPoint);
 
-        quads[activeQuad].m_maskPoints[quads[activeQuad].highlightedMaskPoint] = normalizedWarpedPoint;
+        const int highlighted = quads[activeQuad].highlightedMaskPoint;
+        if ((highlighted >= 0) && (highlighted < (int)quads[activeQuad].m_maskPoints.size())) {
+            quads[activeQuad].m_maskPoints[highlighted] = normalizedWarpedPoint;
+        }
     }
 
     else if (gridSetup && quads[activeQuad].bHighlightCtrlPoint && !bTimeline) {
@@ -1056,12 +1072,18 @@ void ofApp::mouseDragged(int x, int y, int button)
         const ofPoint warpedPoint = quads[activeQuad].getWarpedPoint(mousePosition);
         const ofPoint normalizedWarpedPoint = Util::normalizePoint(warpedPoint);
 
+        // the highlighted point survives a deform-mode toggle or a grid resize, so re-check it against the target
         if (quads[activeQuad].bBezier) {
-            quads[activeQuad].bezierPoints[currentRow][currentCol][0] = normalizedWarpedPoint.x;
-            quads[activeQuad].bezierPoints[currentRow][currentCol][1] = normalizedWarpedPoint.y;
+            if ((currentRow >= 0) && (currentRow < 4) && (currentCol >= 0) && (currentCol < 4)) {
+                quads[activeQuad].bezierPoints[currentRow][currentCol][0] = normalizedWarpedPoint.x;
+                quads[activeQuad].bezierPoints[currentRow][currentCol][1] = normalizedWarpedPoint.y;
+            }
         } else if (quads[activeQuad].bGrid) {
-            quads[activeQuad].gridPoints[currentRow][currentCol][0] = normalizedWarpedPoint.x;
-            quads[activeQuad].gridPoints[currentRow][currentCol][1] = normalizedWarpedPoint.y;
+            vector<vector<vector<float>>>& gridPoints = quads[activeQuad].gridPoints;
+            if ((currentRow >= 0) && (currentRow < (int)gridPoints.size()) && (currentCol >= 0) && (currentCol < (int)gridPoints[currentRow].size())) {
+                gridPoints[currentRow][currentCol][0] = normalizedWarpedPoint.x;
+                gridPoints[currentRow][currentCol][1] = normalizedWarpedPoint.y;
+            }
         }
     }
 
@@ -1256,7 +1278,7 @@ void ofApp::quadBezierReset(int q)
 void ofApp::activateClosestQuad(ofPoint mouse)
 {
     // go through the layers from top to bottom
-    for (int j = 35; j >= 0; j--) {
+    for (int j = MAX_QUADS - 1; j >= 0; j--) {
         int i = layers[j];
         if (i >= 0) {
             if (quads[i].initialized) {
@@ -1282,45 +1304,61 @@ void ofApp::activateClosestQuad(ofPoint mouse)
 //--------------------------------------------------------------
 void ofApp::raiseLayer()
 {
-    int position;
-    int target;
+    if (!hasActiveQuad()) {
+        return;
+    }
 
-    for (int i = 0; i < 35; i++) {
-        if (layers[i] == quads[activeQuad].quadNumber) {
+    int position = -1;
+    for (int i = 0; i < MAX_QUADS; i++) {
+        if (layers[i] == activeQuad) {
             position = i;
-            target = i + 1;
+            break;
         }
     }
-    if (layers[target] != -1) {
-        int target_content = layers[target];
-        layers[target] = quads[activeQuad].quadNumber;
-        layers[position] = target_content;
-        quads[activeQuad].layer = target;
-        quads[target_content].layer = position;
+    if (position < 0) {
+        return;
     }
+
+    const int target = position + 1;
+    if ((target >= MAX_QUADS) || (layers[target] == -1)) {
+        return;
+    }
+
+    const int target_content = layers[target];
+    layers[target] = activeQuad;
+    layers[position] = target_content;
+    quads[activeQuad].layer = target;
+    quads[target_content].layer = position;
 }
 
 //--------------------------------------------------------------
 void ofApp::lowerLayer()
 {
-    int position;
-    int target;
+    if (!hasActiveQuad()) {
+        return;
+    }
 
+    int position = -1;
     for (int i = 0; i < MAX_QUADS; i++) {
-        if (layers[i] == quads[activeQuad].quadNumber) {
+        if (layers[i] == activeQuad) {
             position = i;
-            target = i - 1;
+            break;
         }
     }
-    if (target >= 0) {
-        if (layers[target] != -1) {
-            int target_content = layers[target];
-            layers[target] = quads[activeQuad].quadNumber;
-            layers[position] = target_content;
-            quads[activeQuad].layer = target;
-            quads[target_content].layer = position;
-        }
+    if (position < 0) {
+        return;
     }
+
+    const int target = position - 1;
+    if ((target < 0) || (layers[target] == -1)) {
+        return;
+    }
+
+    const int target_content = layers[target];
+    layers[target] = activeQuad;
+    layers[position] = target_content;
+    quads[activeQuad].layer = target;
+    quads[target_content].layer = position;
 }
 
 //--------------------------------------------------------------
@@ -1450,7 +1488,7 @@ void ofApp::setupCameras()
             // if this camera is the first one or it is marked for being used
             // as the background snapshot camera, save a pointer to it
             if (useForSnapshotBackground == 1 || cameraID == 0) {
-                m_snapshotBackgroundCamera = m_cameras.end() - 1;
+                m_snapshotBackgroundCamera = (int)m_cameras.size() - 1;
                 m_snapshotBackgroundTexture.allocate(camera.getWidth(), camera.getHeight(), GL_RGB);
             }
         }

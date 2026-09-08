@@ -30,6 +30,7 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
             {
                 midiHotkeyKeys.erase(midiHotkeyKeys.begin()+i);
                 midiHotkeyMessages.erase(midiHotkeyMessages.begin()+i);
+                --i;
             }
         }
         }

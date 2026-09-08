@@ -8,10 +8,10 @@ void ofApp::saveCurrentSettingsToXMLFile(std::string xmlFilePath)
 
     // update the XML object with the current settings, before saving it
     xmlSettingsFile.setValue("GENERAL:ACTIVE_QUAD", activeQuad);
-    xmlSettingsFile.setValue("GENERAL:N_OF_QUADS", nOfQuads);
+    xmlSettingsFile.setValue("GENERAL:N_OF_QUADS", countInitializedQuads());
     xmlSettingsFile.setValue("TIMELINE:USE_TIMELINE", useTimeline);
     xmlSettingsFile.setValue("TIMELINE:DURATION", timelineDurationSeconds);
-    for (int j = 0; j < 4; j++) {
+    for (int j = 0; j < MAX_SHARED_VIDEOS; j++) {
         xmlSettingsFile.setValue("SHARED_VIDEOS:VIDEO_" + ofToString(j) + ":PATH", sharedVideosFiles[j]);
     }
 
@@ -156,12 +156,11 @@ void ofApp::loadSettingsFromXMLFile(std::string xmlFilePath)
             if (quads[i].initialized) quads[i].reset();
         }
 
-        nOfQuads = xmlSettingsFile.getValue("GENERAL:N_OF_QUADS", 0);
-        activeQuad = xmlSettingsFile.getValue("GENERAL:ACTIVE_QUAD", 0);
+        const int savedActiveQuad = xmlSettingsFile.getValue("GENERAL:ACTIVE_QUAD", 0);
         useTimeline = xmlSettingsFile.getValue("TIMELINE:USE_TIMELINE", 0);
         timelineDurationSeconds = xmlSettingsFile.getValue("TIMELINE:DURATION", 100);
 
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j < MAX_SHARED_VIDEOS; j++) {
             string sharedVideoPath = xmlSettingsFile.getValue("SHARED_VIDEOS:VIDEO_" + ofToString(j) + ":PATH", "");
             sharedVideosFiles[j] = sharedVideoPath;
             if (sharedVideoPath != "") {
@@ -169,7 +168,12 @@ void ofApp::loadSettingsFromXMLFile(std::string xmlFilePath)
             }
         }
 
-        for (int i = 0; i < nOfQuads; i++) {
+        for (int i = 0; i < MAX_QUADS; i++) {
+            // quads are saved at their slot index, so the numbering may have holes
+            if (!xmlSettingsFile.tagExists("QUADS:QUAD_" + ofToString(i))) {
+                continue;
+            }
+
             float x0 = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":CORNERS:CORNER_0:X", 0.0);
             float y0 = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":CORNERS:CORNER_0:Y", 0.0);
             float x1 = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":CORNERS:CORNER_1:X", 0.0);
@@ -192,9 +196,8 @@ void ofApp::loadSettingsFromXMLFile(std::string xmlFilePath)
             quads[i].setup(ofPoint(x0, y0), ofPoint(x1, y1), ofPoint(x2, y2), ofPoint(x3, y3), edgeBlendShader, quadMaskShader, surfaceShader, crossfadeShader, m_cameras, ttf);
 #endif
 #endif
-            quads[i].quadNumber = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":NUMBER", 0);
-            quads[i].layer = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":LAYER", 0);
-            layers[quads[i].layer] = quads[i].quadNumber;
+            quads[i].quadNumber = i;
+            quads[i].layer = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":LAYER", -1);
 
             quads[i].bTimelineTint = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":TIMELINE:TINT", 0);
             quads[i].bTimelineColor = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":TIMELINE:COLOR", 0);
@@ -229,7 +232,7 @@ void ofApp::loadSettingsFromXMLFile(std::string xmlFilePath)
             }
 
             quads[i].sharedVideoBg = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":SHARED_VIDEO:ACTIVE", 0);
-            quads[i].sharedVideoNum = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":SHARED_VIDEO:NUM", 1);
+            quads[i].sharedVideoNum = ofClamp(xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":SHARED_VIDEO:NUM", 1), 1, MAX_SHARED_VIDEOS);
 
             quads[i].bgSlideshow = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":SLIDESHOW:LOADED_SLIDESHOW", 0);
 
@@ -307,8 +310,52 @@ void ofApp::loadSettingsFromXMLFile(std::string xmlFilePath)
             quads[i].isOn = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":IS_ON", 0);
             quads[i].isActive = false;
         }
-        quads[activeQuad].isActive = true;
-        m_gui.updatePages(quads[activeQuad]);
+
+        nOfQuads = countInitializedQuads();
+        if (nOfQuads == 0) {
+            ofLogWarning() << "No surfaces found in " << xmlFilePath << ", falling back to the default ones";
+            setupInitialQuads();
+            timelineSyncQuadPages();
+            m_gui.updatePages(quads[activeQuad]);
+            m_gui.showPage(2);
+            glDisable(GL_DEPTH_TEST);
+            return;
+        }
+
+        // claim the saved layer slot when it is free and in range, otherwise take any free one
+        for (int i = 0; i < MAX_QUADS; i++) {
+            if (!quads[i].initialized) continue;
+            const int layer = quads[i].layer;
+            if ((layer >= 0) && (layer < MAX_QUADS) && (layers[layer] == -1)) {
+                layers[layer] = i;
+            } else {
+                quads[i].layer = -1;
+            }
+        }
+        for (int i = 0; i < MAX_QUADS; i++) {
+            if (!quads[i].initialized || (quads[i].layer >= 0)) continue;
+            for (int j = 0; j < MAX_QUADS; j++) {
+                if (layers[j] == -1) {
+                    layers[j] = i;
+                    quads[i].layer = j;
+                    break;
+                }
+            }
+        }
+
+        activeQuad = -1;
+        if ((savedActiveQuad >= 0) && (savedActiveQuad < MAX_QUADS) && quads[savedActiveQuad].initialized) {
+            setActiveQuad(savedActiveQuad);
+        } else {
+            for (int i = 0; i < MAX_QUADS; i++) {
+                if (quads[i].initialized) {
+                    setActiveQuad(i);
+                    break;
+                }
+            }
+        }
+
+        timelineSyncQuadPages();
         m_gui.showPage(2);
 
         if(!bGui) {

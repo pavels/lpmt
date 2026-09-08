@@ -73,6 +73,12 @@ void ofApp::timelineTriggerReceived(ofxTLBangEventArgs& trigger){
 
     vector<string> triggerParts = ofSplitString(trigger.track->getName(), "_", true, true);
 
+    // track headers are user-editable, so the name may not carry a surface suffix at all
+    if(triggerParts.size() < 2) {
+        cout << "ignoring trigger from track '" << trigger.track->getName() << "' (no surface suffix)" << endl;
+        return;
+    }
+
     if(useTimeline)
     {
         //cout << "Trigger from " << trigger.triggerGroupName << " says color " << trigger.triggerName << endl;
@@ -85,11 +91,19 @@ void ofApp::timelineTriggerReceived(ofxTLBangEventArgs& trigger){
         if(triggerParts[1] != "main")
         {
             int tlQuad = ofToInt(triggerParts[1]);
+            if((tlQuad < 0) || (tlQuad >= MAX_QUADS) || !quads[tlQuad].initialized) {
+                cout << "ignoring trigger for unknown surface " << tlQuad << endl;
+                return;
+            }
 
             //check if we have a message with a parameter, parameters are given using a colon ':' as separator
             if (ofIsStringInString(tlMsg,":"))
             {
                 vector<string> tlMsgParts = ofSplitString(tlMsg, ":", true, true);
+                if(tlMsgParts.size() < 2) {
+                    cout << "ignoring trigger command '" << tlMsg << "' (missing parameter after ':')" << endl;
+                    return;
+                }
                 tlMsg = tlMsgParts[0];
                 tlMsgParameter = tlMsgParts[1];
             }
@@ -108,11 +122,11 @@ void ofApp::timelineTriggerReceived(ofxTLBangEventArgs& trigger){
             else if (tlMsg == "video_position" && tlMsgParameter != ""){ quads[tlQuad].video.setPosition(ofToFloat(tlMsgParameter));}
             else if (tlMsg == "shared_video_on"){ quads[tlQuad].sharedVideoBg=true; }
             else if (tlMsg == "shared_video_off"){ quads[tlQuad].sharedVideoBg=false; }
-            else if (tlMsg == "shared_video_num" && tlMsgParameter != ""){ quads[tlQuad].sharedVideoNum=ofToInt(tlMsgParameter); }
+            else if (tlMsg == "shared_video_num" && tlMsgParameter != ""){ quads[tlQuad].sharedVideoNum=ofClamp(ofToInt(tlMsgParameter), 1, MAX_SHARED_VIDEOS); }
             else if (tlMsg == "slide_on"){ quads[tlQuad].slideshowBg=true; }
             else if (tlMsg == "slide_off"){ quads[tlQuad].slideshowBg=false; }
             else if (tlMsg == "slide_new"){ quads[tlQuad].currentSlideId+=1; }
-            else if (tlMsg == "slide_num" && tlMsgParameter != ""){ quads[tlQuad].currentSlideId=ofToInt(tlMsgParameter); }
+            else if (tlMsg == "slide_num" && tlMsgParameter != ""){ quads[tlQuad].currentSlideId=max(0, ofToInt(tlMsgParameter)); }
             else if (tlMsg == "cam_on"){ quads[tlQuad].camBg=true; }
             else if (tlMsg == "cam_off"){ quads[tlQuad].camBg=false; }
             else if (tlMsg == "kinect_on"){ quads[tlQuad].kinectBg=true; }
@@ -137,7 +151,7 @@ void ofApp::timelineTriggerReceived(ofxTLBangEventArgs& trigger){
             // check messages
             if (tlMsg == "shared_videos_reset")
             {
-                for(int j=0; j<4; j++)
+                for(int j=0; j<MAX_SHARED_VIDEOS; j++)
                 {
                     if(sharedVideos[j].isLoaded())
                     {
@@ -147,7 +161,7 @@ void ofApp::timelineTriggerReceived(ofxTLBangEventArgs& trigger){
             }
             else if (tlMsg == "shared_video_reset" && tlMsgParameter != "")
             {
-                if(ofToInt(tlMsgParameter) > 0 && ofToInt(tlMsgParameter) <= 4)
+                if(ofToInt(tlMsgParameter) > 0 && ofToInt(tlMsgParameter) <= MAX_SHARED_VIDEOS)
                 {
                     if(sharedVideos[ofToInt(tlMsgParameter)-1].isLoaded())
                     {
@@ -188,7 +202,32 @@ void ofApp::timelineAddQuadPage(int i) {
 }
 
 //--------------------------------------------------------------
+bool ofApp::timelineHasQuadPage(int i) {
+
+    const vector<ofxTLPage*>& pages = timeline.getPages();
+    for (size_t p = 0; p < pages.size(); p++) {
+        if (pages[p]->getName() == ofToString(i)) return true;
+    }
+    return false;
+}
+
+//--------------------------------------------------------------
+void ofApp::timelineSyncQuadPages() {
+
+    for (int i = 0; i < MAX_QUADS; i++) {
+        const bool hasPage = timelineHasQuadPage(i);
+        if (quads[i].initialized && !hasPage) {
+            timelineAddQuadPage(i);
+        } else if (!quads[i].initialized && hasPage) {
+            timelineRemoveQuadPage(i);
+        }
+    }
+}
+
+//--------------------------------------------------------------
 void ofApp::timelineRemoveQuadPage(int i) {
+
+    if (!timelineHasQuadPage(i)) return;
 
     timeline.setCurrentPage(timeline.getPages().at(0)->getName());
     timeline.removeTrack("red_"+ofToString(i));
