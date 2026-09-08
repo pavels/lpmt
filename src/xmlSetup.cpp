@@ -152,6 +152,10 @@ void ofApp::loadSettingsFromXMLFile(std::string xmlFilePath)
             layers[i] = -1;
         }
 
+        for (int i = 0; i < MAX_QUADS; i++) {
+            if (quads[i].initialized) quads[i].reset();
+        }
+
         nOfQuads = xmlSettingsFile.getValue("GENERAL:N_OF_QUADS", 0);
         activeQuad = xmlSettingsFile.getValue("GENERAL:ACTIVE_QUAD", 0);
         useTimeline = xmlSettingsFile.getValue("TIMELINE:USE_TIMELINE", 0);
