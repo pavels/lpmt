@@ -29,6 +29,13 @@ Screenshots of the current version:
 ![Screenshot of LPMT](screenshots/screenshot2.jpg)
 ![Screenshot of LPMT](screenshots/screenshot3.jpg)
 
+## OSC control
+
+LPMT listens on port 12345 by default. Surface addressing is stateless
+(`/surface/<n>/<param>`, n = 0..35) so a sender never has to track receiver state.
+The full address reference is in [OSC_ADDRESSES.md](OSC_ADDRESSES.md); example
+controllers live in `bin/data/osc/` (Pure Data patch, TouchOSC layout, JS module).
+
 ## Installation instructions
 
 Install openFrameworks and follow the setup instructions [here](https://openframeworks.cc/download/)

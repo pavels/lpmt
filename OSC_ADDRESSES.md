@@ -115,16 +115,3 @@ Kinect parameters (`kinect/...`) are registered only in builds with `WITH_KINECT
     /projection/timeline/play               toggles playback
     /projection/timeline/duration <sec>     minimum 10
     /projection/sharedvideo/path <n> <path> load shared video n (1 .. 8)
-
-## Changed from earlier versions
-
-* `/active/...` and `/active/set` are gone. Use `/surface/<n>/...`; in most cases the
-  only change is the address prefix.
-* `/projection/fullscreen/on|off|toggle` became `/projection/fullscreen [0|1]`.
-  The same applies to `gui`, `mode/setup`, `mode/masksetup` and `timeline/use`.
-* `/projection/timeline/start` became `/projection/timeline/play`.
-* `/projection/save` no longer opens a dialog; it writes the project file directly.
-* `/corners/x|y <quad> <corner> <v>` became `/surface/<n>/corners/<c>/x|y <v>`.
-* `/image <quad> <appid> <blob>` became `/surface/<n>/img/blob <appid> <blob>`.
-* `/projection/mpe/connect` is gone (the MPE code it called is commented out).
-* OSC "learning" is gone. Every parameter now has a fixed address.
