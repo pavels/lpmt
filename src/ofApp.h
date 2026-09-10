@@ -63,6 +63,8 @@ public:
     void render();
     void setupInitialQuads();
     void setupCameras();
+    void refreshNdiSources();
+    int ndiChoiceForSource(const string& name) const;
     void setupOSC();
     void setupMidi();
     void setupSyphon();
@@ -174,6 +176,7 @@ public:
     bool m_bezierSpherizeQuadFlag;
     bool m_bezierSpherizeQuadStrongFlag;
     bool m_bezierResetQuadFlag;
+    bool m_refreshNdiSourcesFlag;
 
     float m_totalRotationAngle;
     ofPolyline m_rotationSector;
@@ -184,6 +187,10 @@ public:
 	std::vector<ofVideoGrabber> m_cameras;
 	int m_snapshotBackgroundCamera; // index into m_cameras, -1 when none; an iterator would dangle as the vector grows
 	std::vector<string> m_cameraIds;
+
+    // discovered NDI senders; the gui combo shows "(none)" at 0, so a sender's
+    // choice index is its position here plus one
+    std::vector<string> m_ndiSources;
 
     vector<LpmtVideoPlayer> sharedVideos;
     vector<string> sharedVideosFiles;

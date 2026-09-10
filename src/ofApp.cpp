@@ -110,6 +110,7 @@ void ofApp::setup()
     m_bezierSpherizeQuadFlag = false;
     m_bezierSpherizeQuadStrongFlag = false;
     m_bezierResetQuadFlag = false;
+    m_refreshNdiSourcesFlag = false;
 
     // setup shaders
     edgeBlendShader.load("shaders/blend.vert", "shaders/blend.frag");
@@ -143,6 +144,7 @@ void ofApp::setup()
 
     // GUI stuff
     m_gui.setupPages();
+    refreshNdiSources();
     m_gui.updatePages(quads[activeQuad]);
     m_gui.showPage(2);
 
@@ -262,6 +264,23 @@ void ofApp::prepare()
         if (m_bezierSpherizeQuadStrongFlag) {
             m_bezierSpherizeQuadStrongFlag = false;
             quadBezierSpherizeStrong(activeQuad);
+        }
+
+        // the combo box writes an index, the surface keeps the sender name;
+        // choice 0 and any leftover "(none)" row past the end both clear it
+        if (hasActiveQuad()) {
+            quad& q = quads[activeQuad];
+            const bool isSender = (q.ndiSourceIndex >= 1) && (q.ndiSourceIndex <= (int)m_ndiSources.size());
+            const string chosen = isSender ? m_ndiSources[q.ndiSourceIndex - 1] : "";
+            if (chosen != q.ndiSourceName) {
+                q.ndiSourceName = chosen;
+                if (chosen.empty()) q.ndi.close();
+            }
+        }
+
+        if (m_refreshNdiSourcesFlag) {
+            m_refreshNdiSourcesFlag = false;
+            refreshNdiSources();
         }
 
         //check if quad bezier reset button in the GUI was pressed
@@ -1310,6 +1329,36 @@ void ofApp::setupInitialQuads()
     quads[2].layer = 2;
     layers[3] = 3;
     quads[3].layer = 3;
+}
+
+//--------------------------------------------------------------
+void ofApp::refreshNdiSources()
+{
+    m_ndiSources = LpmtNdi::findSources();
+
+    // a sender saved in the project stays selectable while it is off the network
+    for (int i = 0; i < MAX_QUADS; i++) {
+        const string& saved = quads[i].ndiSourceName;
+        if (!quads[i].initialized || saved.empty()) continue;
+        if (std::find(m_ndiSources.begin(), m_ndiSources.end(), saved) == m_ndiSources.end()) {
+            m_ndiSources.push_back(saved);
+        }
+    }
+
+    m_gui.setNdiSources(m_ndiSources);
+    if (hasActiveQuad()) {
+        m_gui.updatePages(quads[activeQuad]);
+    }
+}
+
+//--------------------------------------------------------------
+int ofApp::ndiChoiceForSource(const string& name) const
+{
+    if (name.empty()) return 0;
+    for (size_t i = 0; i < m_ndiSources.size(); i++) {
+        if (m_ndiSources[i] == name) return (int)i + 1;
+    }
+    return 0;
 }
 
 //--------------------------------------------------------------

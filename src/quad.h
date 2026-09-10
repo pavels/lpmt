@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "LpmtVideoPlayer.h"
+#include "LpmtNdiSource.h"
 
 //#define WITH_KINECT
 
@@ -46,6 +47,7 @@ public:
     bool isValidContent(vector<LpmtVideoPlayer>& sharedVideos);
     bool hasSharedVideo(vector<LpmtVideoPlayer>& sharedVideos) const;
     bool hasCamera() const;
+    bool hasNdi() const;
     void drawContent(float w, float h, vector<LpmtVideoPlayer>& sharedVideos);
 
 #ifdef WITH_KINECT
@@ -95,6 +97,12 @@ public:
     bool camAvailable;
     int camNumber;
     int prevCamNumber;
+
+    /* NDI stuff */
+    bool ndiBg;
+    string ndiSourceName;
+    int ndiSourceIndex; // position in the app's discovered sender list, for the gui only
+    LpmtNdiSource ndi;
 
     int layer;
 

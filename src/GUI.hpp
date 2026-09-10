@@ -2,6 +2,9 @@
 #define GUI_INCLUDE
 
 #include "ofxSimpleGuiToo.h"
+
+#include <string>
+#include <vector>
 #include "quad.h"
 
 class ofApp;
@@ -13,6 +16,7 @@ public:
 
     void setupPages();
     void updatePages(quad& activeQuad);
+    void setNdiSources(const std::vector<std::string>& sources);
 
     void nextPage();
     void prevPage();

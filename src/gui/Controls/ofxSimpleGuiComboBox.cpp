@@ -37,22 +37,45 @@ ofxSimpleGuiComboBox::~ofxSimpleGuiComboBox() {
 
 
 void ofxSimpleGuiComboBox::setTitleForIndex(int index, string title) {
-	if(index < 0 || index >= m_choices.size()) return;
+	if(index < 0 || index >= (int)m_choices.size()) return;
 	m_choices[index] = title;
 }
 
 string ofxSimpleGuiComboBox::getTitleForIndex(int index) {
-	if(index < 0 || index >= m_choices.size())return m_choices.size() ? m_choices[*m_selectedChoice] : "No Choices Available";
+	if(m_choices.empty()) return "No Choices Available";
+	if(index < 0 || index >= (int)m_choices.size()) {
+		clampSelection();
+		return m_choices[*m_selectedChoice];
+	}
 	return m_choices[index];
+}
+
+int ofxSimpleGuiComboBox::numChoices() const {
+	return (int)m_choices.size();
+}
+
+// the selection lives in the caller's variable, so a shrinking list can leave it past the end
+void ofxSimpleGuiComboBox::clampSelection() {
+	const int last = (int)m_choices.size() - 1;
+	if(*m_selectedChoice > last) *m_selectedChoice = last;
+	if(*m_selectedChoice < 0) *m_selectedChoice = 0;
+	if(m_mouseChoice > last) m_mouseChoice = last; // -1 stays, it means nothing is hovered
 }
 
 
 void ofxSimpleGuiComboBox::addChoice(string title, int index) {
-	int insertIndex = m_choices.size();
+	const int oldSize = (int)m_choices.size();
+	int insertIndex = oldSize;
 
-	if(index >= 0 && index < m_choices.size()) insertIndex = index;
+	if(index >= 0 && index < oldSize) insertIndex = index;
 
 	m_choices.insert(m_choices.begin() + insertIndex, title);
+
+	//an insert pushes the choices at and after it up, an append moves nothing
+	if(insertIndex < oldSize) {
+		if(*m_selectedChoice >= insertIndex) (*m_selectedChoice)++;
+		if(m_mouseChoice >= insertIndex) m_mouseChoice++;
+	}
 }
 
 
@@ -69,16 +92,19 @@ void ofxSimpleGuiComboBox::removeChoice(string title) {
 }
 
 void ofxSimpleGuiComboBox::removeChoice(int index) {
-	int removeIndex = m_choices.size() - 1;
-	if(index >= 0 && index < m_choices.size())
+	if(m_choices.empty()) return;
+
+	int removeIndex = (int)m_choices.size() - 1;
+	if(index >= 0 && index < (int)m_choices.size())
 		removeIndex = index;
 
 	m_choices.erase(m_choices.begin() + removeIndex);
 	//also update the selected indexes.
 	if(*m_selectedChoice >= removeIndex)
-		*m_selectedChoice--;
+		(*m_selectedChoice)--;
 	if(m_mouseChoice >= removeIndex)
 		m_mouseChoice--;
+	clampSelection();
 }
 
 void ofxSimpleGuiComboBox::setup() {
@@ -105,7 +131,7 @@ int ofxSimpleGuiComboBox::getValue() {
 }
 
 void ofxSimpleGuiComboBox::setValue(int index) {
-	*m_selectedChoice = ofClamp(index, 0, m_choices.size());
+	*m_selectedChoice = m_choices.empty() ? 0 : (int)ofClamp(index, 0, (int)m_choices.size() - 1);
 }
 
 void ofxSimpleGuiComboBox::setValue(string title) {
@@ -222,6 +248,7 @@ void ofxSimpleGuiComboBox::setCBTextBGColor() {
 #define kSGCBTextPaddingY    15
 void ofxSimpleGuiComboBox::draw(float x, float y) {
 	setPosition(x, y);
+	clampSelection();
 
 	glPushMatrix();
 	glTranslatef(x, y, 0);
@@ -243,9 +270,9 @@ void ofxSimpleGuiComboBox::draw(float x, float y) {
     ofDrawRectangle(0,config->comboBoxHeight/2, width, config->comboBoxHeight/2);
     setTextColor();
     if (config->bUseFont) {
-        config->ttf.drawString(m_choices.size() ? m_choices[*m_selectedChoice] : "N/A", kSGCBTextPaddingX, kSGCBTextPaddingY * 2 + 3);
+        config->ttf.drawString(m_choices.size() ? getTitleForIndex() : "N/A", kSGCBTextPaddingX, kSGCBTextPaddingY * 2 + 3);
     } else {
-        ofDrawBitmapString(m_choices.size() ? m_choices[*m_selectedChoice] : "N/A", kSGCBTextPaddingX, kSGCBTextPaddingY * 2 + 3); // 3 pixel margin between texts
+        ofDrawBitmapString(m_choices.size() ? getTitleForIndex() : "N/A", kSGCBTextPaddingX, kSGCBTextPaddingY * 2 + 3); // 3 pixel margin between texts
     }
 
 	//draw a combobox down triangle icon so the users know to click

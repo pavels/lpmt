@@ -193,6 +193,8 @@ std::map<std::string, SurfaceFn> buildSurfaceTable()
 
     addBool(t, "cam", &quad::camBg, true);
 
+    addBool(t, "ndi", &quad::ndiBg, true);
+
     addBool(t, "greenscreen", &quad::bUseGreenscreen, true);
     addFloat(t, "greenscreen/threshold", &quad::thresholdGreenscreen, 0.0f, 255.0f);
     addColor(t, "greenscreen/color", &quad::colorGreenscreen);
@@ -276,6 +278,19 @@ std::map<std::string, SurfaceFn> buildSurfaceActionTable()
         q.imgBg = true;
     };
 
+    t["ndi/source"] = [](ofApp& app, quad& q, const ofxOscMessage& m) {
+        const std::string name = argString(m, 0);
+        q.ndiSourceName = name;
+        q.ndiSourceIndex = app.ndiChoiceForSource(name);
+        if (name.empty()) q.ndi.close();
+    };
+    t["ndi/select"] = [](ofApp& app, quad& q, const ofxOscMessage& m) {
+        const int source = argInt(m, 0, -1);
+        if ((source < 0) || (source >= (int)app.m_ndiSources.size())) return;
+        q.ndiSourceName = app.m_ndiSources[source];
+        q.ndiSourceIndex = source + 1;
+    };
+
     t["cam/select"] = [](ofApp& app, quad& q, const ofxOscMessage& m) {
         const int cam = argInt(m, 0, q.camNumber);
         if ((cam >= 0) && (cam < (int)app.m_cameras.size())) q.camNumber = cam;
@@ -326,6 +341,8 @@ const std::map<std::string, GlobalFn>& globalTable()
         { "/projection/timeline/show", [](ofApp& app, const ofxOscMessage& m) {
              app.setTimelineVisible(m.getNumArgs() == 0 ? !app.bTimeline : (argFloat(m, 0) != 0.0f));
          } },
+
+        { "/projection/ndi/refresh", [](ofApp& app, const ofxOscMessage&) { app.refreshNdiSources(); } },
 
         { "/projection/sharedvideo/path", [](ofApp& app, const ofxOscMessage& m) {
              const int slot = argInt(m, 0, -1);

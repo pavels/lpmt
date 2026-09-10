@@ -46,6 +46,11 @@ void quad::reset()
 
     camNumber = prevCamNumber = 0;
 
+    ndiBg = false;
+    ndiSourceName = "";
+    ndiSourceIndex = 0;
+    ndi.close();
+
     imgMultX = 1.0;
     imgMultY = 1.0;
 
@@ -233,6 +238,15 @@ void quad::update()
 
         if (camAvailable && camNumber != prevCamNumber) {
             prevCamNumber = camNumber;
+        }
+
+        // receiving binds an fbo of its own, so it has to happen outside quadFbo
+        if (ndiBg && !ndiSourceName.empty()) {
+            ndi.setSource(ndiSourceName);
+            ndi.update();
+        } else if (!ndi.source().empty()) {
+            // stop pulling the stream while the surface is not showing it
+            ndi.close();
         }
         //recalculates center of quad
         center = (corners[0] + corners[1] + corners[2] + corners[3]) / 4;
@@ -779,6 +793,10 @@ void quad::drawSurface(vector<LpmtVideoPlayer>& sharedVideos)
             srcWidth = cams[camNumber].getWidth();
             srcHeight = cams[camNumber].getHeight();
             imageTex = imageTex2 = cams[camNumber].getTexture();
+        } else if (ndiBg && hasNdi()) {
+            srcWidth = ndi.getWidth();
+            srcHeight = ndi.getHeight();
+            imageTex = imageTex2 = ndi.getTexture();
         } else if (videoBg && video.isLoaded()) {
             srcWidth = video.getWidth();
             srcHeight = video.getHeight();
@@ -965,6 +983,12 @@ bool quad::hasCamera() const
 }
 
 //--------------------------------------------------------------
+bool quad::hasNdi() const
+{
+    return ndi.isReady();
+}
+
+//--------------------------------------------------------------
 bool quad::isValidContent(vector<LpmtVideoPlayer>& sharedVideos)
 {
     if (colorBg)
@@ -972,6 +996,8 @@ bool quad::isValidContent(vector<LpmtVideoPlayer>& sharedVideos)
     else if (imgBg && img.getWidth() > 0)
         return true;
     else if (camBg && hasCamera() && cams[camNumber].getWidth() > 0)
+        return true;
+    else if (ndiBg && hasNdi())
         return true;
     else if (videoBg && video.isLoaded())
         return true;
@@ -992,6 +1018,8 @@ void quad::drawContent(float w, float h, vector<LpmtVideoPlayer>& sharedVideos)
         img.draw(0, 0, w, h);
     } else if (camBg && hasCamera() && cams[camNumber].getWidth() > 0) {
         cams[camNumber].getTexture().draw(0, 0, w, h);
+    } else if (ndiBg && hasNdi()) {
+        ndi.draw(0, 0, w, h);
     } else if (videoBg && video.isLoaded()) {
         video.draw(0, 0, w, h);
     } else if (sharedVideoBg && hasSharedVideo(sharedVideos)) {

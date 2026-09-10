@@ -58,6 +58,10 @@ expected. Values are clamped to the same ranges as the corresponding GUI sliders
     cam                             camera content on/off (alias: cam/show)
     cam/select <int>                which camera, by index
 
+    ndi                             NDI content on/off    (alias: ndi/show)
+    ndi/source <string>             receive from this NDI sender name
+    ndi/select <int>                pick a sender by index in the discovered list
+
     solid                           solid colour on/off   (alias: solid/show)
 
     mask                            mask on/off           (alias: mask/show)
@@ -114,4 +118,5 @@ Kinect parameters (`kinect/...`) are registered only in builds with `WITH_KINECT
     /projection/timeline/show [0|1]
     /projection/timeline/play               toggles playback
     /projection/timeline/duration <sec>     minimum 10
+    /projection/ndi/refresh                 rescan the network for NDI senders
     /projection/sharedvideo/path <n> <path> load shared video n (1 .. 8)

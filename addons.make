@@ -1,5 +1,6 @@
 ofxKinect
 ofxMidi
+ofxNDI
 ofxNetwork
 ofxOpenCv
 ofxOsc

@@ -52,6 +52,8 @@ void ofApp::saveCurrentSettingsToXMLFile(std::string xmlFilePath)
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":SLIDESHOW:SPEED", quads[i].slideshowSpeed);
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":SLIDESHOW:TRANSITIONS", quads[i].bFadeTransitions);
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":CAM:ACTIVE", quads[i].camBg);
+            xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":NDI:ACTIVE", quads[i].ndiBg);
+            xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":NDI:SOURCE", quads[i].ndiSourceName);
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":IMG:ACTIVE", quads[i].imgBg);
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":VIDEO:ACTIVE", quads[i].videoBg);
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":IMG:MULT_X", quads[i].imgMultX);
@@ -243,6 +245,8 @@ void ofApp::loadSettingsFromXMLFile(std::string xmlFilePath)
             quads[i].bFadeTransitions = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":SLIDESHOW:TRANSITIONS", 0);
 
             quads[i].camBg = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":CAM:ACTIVE", 0);
+            quads[i].ndiBg = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":NDI:ACTIVE", 0);
+            quads[i].ndiSourceName = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":NDI:SOURCE", "");
 
             quads[i].imgMultX = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":IMG:MULT_X", 1.0);
             quads[i].imgMultY = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":IMG:MULT_Y", 1.0);

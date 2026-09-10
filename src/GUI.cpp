@@ -110,6 +110,11 @@ void GUI::setupPages()
         }        
     }
 
+    m_gui.addTitle("NDI");
+    m_gui.addToggle("NDI on/off", m_dummyBool);
+    m_gui.addComboBox("Select NDI source", m_dummyInt, 1, NULL);
+    m_gui.addButton("Refresh NDI sources", m_app->m_refreshNdiSourcesFlag);
+
     m_gui.addTitle("Video");
     m_gui.addToggle("Video on/off", m_dummyBool);
     m_gui.addButton("Load Video", m_app->m_loadVideoFlag);
@@ -274,6 +279,10 @@ void GUI::updatePages(quad& activeQuad)
         }
     }
 
+    activeQuad.ndiSourceIndex = m_app->ndiChoiceForSource(activeQuad.ndiSourceName);
+    dynamic_cast<ofxSimpleGuiToggle*>(firstPage.findControlByName("NDI on/off"))->value = &activeQuad.ndiBg;
+    dynamic_cast<ofxSimpleGuiComboBox*>(firstPage.findControlByName("Select NDI source"))->m_selectedChoice = &activeQuad.ndiSourceIndex;
+
     dynamic_cast<ofxSimpleGuiToggle*>(firstPage.findControlByName("Video on/off"))->value = &activeQuad.videoBg;
     dynamic_cast<ofxSimpleGuiSliderFloat*>(firstPage.findControlByName("Video Volume"))->value = &activeQuad.videoVolume;
     dynamic_cast<ofxSimpleGuiSliderFloat*>(firstPage.findControlByName("Video Speed"))->value = &activeQuad.videoSpeed;
@@ -359,6 +368,26 @@ void GUI::updatePages(quad& activeQuad)
     dynamic_cast<ofxSimpleGuiSliderFloat*>(thirdPage.findControlByName("center X"))->value = &activeQuad.circularCrop[0];
     dynamic_cast<ofxSimpleGuiSliderFloat*>(thirdPage.findControlByName("center Y"))->value = &activeQuad.circularCrop[1];
     dynamic_cast<ofxSimpleGuiSliderFloat*>(thirdPage.findControlByName("radius"))->value = &activeQuad.circularCrop[2];
+}
+
+
+void GUI::setNdiSources(const std::vector<std::string>& sources)
+{
+    ofxSimpleGuiComboBox* combo = dynamic_cast<ofxSimpleGuiComboBox*>(m_gui.page("PAGE 1").findControlByName("Select NDI source"));
+    if (!combo) return;
+
+    const int wanted = (int)sources.size() + 1; // choice 0 is "(none)"
+    while (combo->numChoices() > wanted) {
+        combo->removeChoice();
+    }
+    while (combo->numChoices() < wanted) {
+        combo->addChoice("");
+    }
+
+    combo->setTitleForIndex(0, "(none)");
+    for (int i = 1; i < wanted; i++) {
+        combo->setTitleForIndex(i, sources[i - 1]);
+    }
 }
 
 
