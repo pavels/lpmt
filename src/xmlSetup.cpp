@@ -359,6 +359,8 @@ void ofApp::loadSettingsFromXMLFile(std::string xmlFilePath)
             }
         }
 
+        // the combo box index is derived from the list, so the saved sender names must be in it
+        refreshNdiSources();
         timelineSyncQuadPages();
         m_gui.showPage(2);
 

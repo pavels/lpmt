@@ -29,3 +29,7 @@ bin/lpmt.ipdb
 bin/lpmt.lib
 
 
+
+# copied in by ofxNDI addon_config.mk on every make, unused by LPMT
+bin/data/yuv2rgba/
+bin/data/rgba2yuv/
