@@ -25,6 +25,8 @@ NDIlib_find_instance_t ndiFinder()
     return finder;
 }
 
+const float SOURCE_TIMEOUT_SECONDS = 5.0f;
+
 ofTexture& emptyTexture()
 {
     static ofTexture texture;
@@ -39,6 +41,7 @@ struct LpmtNdiSource::Impl {
     ofTexture texture;
     std::string name;
     int64_t lastTimestamp = 0;
+    float lastFrameTime = 0.0f;
     NDIlib_FourCC_video_type_e lastFourCC = NDIlib_FourCC_video_type_max;
 
     ~Impl() { disconnect(); }
@@ -84,6 +87,7 @@ struct LpmtNdiSource::Impl {
         sync = nullptr;
         receiver = nullptr;
         lastTimestamp = 0;
+        lastFrameTime = 0.0f;
         lastFourCC = NDIlib_FourCC_video_type_max;
     }
 
@@ -157,13 +161,19 @@ void LpmtNdiSource::update()
     // whatever packet arrived last, which is what made playback stutter
     NDIlib_video_frame_v2_t frame{};
     lib->framesync_capture_video(impl->sync, &frame, NDIlib_frame_format_type_progressive);
-    if (!frame.p_data) return;
-
-    if (frame.xres > 0 && frame.yres > 0 && frame.timestamp != impl->lastTimestamp) {
-        impl->upload(frame);
-        impl->lastTimestamp = frame.timestamp;
+    if (frame.p_data) {
+        if (frame.xres > 0 && frame.yres > 0 && frame.timestamp != impl->lastTimestamp) {
+            impl->upload(frame);
+            impl->lastTimestamp = frame.timestamp;
+            impl->lastFrameTime = ofGetElapsedTimef();
+        }
+        lib->framesync_free_video(impl->sync, &frame);
     }
-    lib->framesync_free_video(impl->sync, &frame);
+
+    // the frame sync keeps repeating the last frame after the sender is gone
+    if (impl->texture.isAllocated() && ofGetElapsedTimef() - impl->lastFrameTime > SOURCE_TIMEOUT_SECONDS) {
+        impl->texture.clear();
+    }
 }
 
 void LpmtNdiSource::close()
