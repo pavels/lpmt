@@ -20,7 +20,6 @@ public:
     void setSource(const std::string& name);
     const std::string& source() const;
 
-    // binds an fbo of its own for YUV conversion, so never call it inside another fbo
     void update();
     void close();
 
