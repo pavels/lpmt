@@ -91,7 +91,7 @@ void GUI::setupPages()
     m_gui.addSlider("Video Speed", m_dummyFloat, -2.0, 4.0);
     m_gui.addToggle("Video Loop", m_dummyBool);
 
-    m_gui.addTitle("Shared Video");
+    m_gui.addTitle("Shared videos");
     m_gui.addToggle("Shared Video on/off", m_dummyBool);
     m_gui.addToggle("Shared Video tiling", m_dummyBool);
     m_gui.addSlider("Shared Video", m_dummyInt, 1, 8);
