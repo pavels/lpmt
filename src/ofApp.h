@@ -82,8 +82,6 @@ public:
     void setActiveQuad(int index);
     bool hasActiveQuad() const;
     int countInitializedQuads() const;
-    void quadDimensionsReset(int q);
-    void quadPlacementReset(int q);
     void quadBezierSpherize(int q);
     void quadBezierSpherizeStrong(int q);
     void quadBezierReset(int q);
@@ -175,7 +173,6 @@ public:
     bool m_loadSharedVideo5Flag;
     bool m_loadSharedVideo6Flag;
     bool m_loadSharedVideo7Flag;
-    bool m_resetCurrentQuadFlag;
     bool m_resetCornersFlag;
     bool m_resetMaskFlag;
     bool m_resetGridFlag;

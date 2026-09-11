@@ -2,7 +2,7 @@ GENERAL
 space - projection / setup mode   |   g - show/hide gui (hide it to edit with the mouse)
 f - fullscreen   |   w / SHIFT-w - window background from camera / image file   |   h - this help   |   CTRL-q - quit
 p / o - start / stop projection   |   r - resync videos, slideshows and transitions
-CTRL-s - save project to the startup file   |   F1..F4 or [ ] - gui pages
+CTRL-s - save project to the startup file   |   F1..F4 or [ ] - gui pages: general, content, look, geometry
 
 SURFACES (setup mode)
 a - add   |   CTRL-x - delete   |   CTRL-SHIFT-x - delete all   |   < > - previous / next
@@ -17,7 +17,7 @@ MASK (m - toggle; setup mode, gui hidden)
 click - add point   |   drag - move point   |   d - delete point under mouse
 F2 - delete last point   |   c - clear mask
 
-DEFORM (b - toggle; setup mode, gui hidden; enable "Use bezier" or "Use grid" on page 2)
+DEFORM (b - toggle; setup mode, gui hidden; enable "Use bezier" or "Use grid" on the geometry page)
 drag - move a bezier / grid control point
 
 TIMELINE (while shown, only these keys and F4 / CTRL-q work)

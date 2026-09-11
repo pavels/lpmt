@@ -49,6 +49,7 @@ public:
     bool hasCamera() const;
     bool hasNdi() const;
     void drawContent(float w, float h, vector<LpmtVideoPlayer>& sharedVideos);
+    void drawRegion(ofTexture& tex, float w, float h);
 
 #ifdef WITH_KINECT
     void setKinect(kinectManager* kinect);
@@ -224,10 +225,7 @@ public:
     float saturation;
     float luminance;
 
-    int quadDispX;
-    int quadDispY;
-    int quadW;
-    int quadH;
+    float srcRegion[4]; // x, y, w, h as fractions of the content
 
     std::vector<ofPoint> m_maskPoints;
     bool bHighlightMaskPoint;

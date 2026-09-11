@@ -106,7 +106,6 @@ void ofApp::setup()
     m_loadSharedVideo5Flag = false;
     m_loadSharedVideo6Flag = false;
     m_loadSharedVideo7Flag = false;
-    m_resetCurrentQuadFlag = false;
     m_resetCornersFlag = false;
     m_resetMaskFlag = false;
     m_resetGridFlag = false;
@@ -250,13 +249,6 @@ void ofApp::prepare()
             loadSlideshow();
         }
 
-        //check if quad dimensions reset button in the GUI was pressed
-        if (m_resetCurrentQuadFlag) {
-            m_resetCurrentQuadFlag = false;
-            quadDimensionsReset(activeQuad);
-            quadPlacementReset(activeQuad);
-        }
-
         if (m_resetCornersFlag) {
             m_resetCornersFlag = false;
             if (hasActiveQuad()) quadCornersReset(activeQuad);
@@ -264,7 +256,14 @@ void ofApp::prepare()
 
         if (m_resetMaskFlag) {
             m_resetMaskFlag = false;
-            if (hasActiveQuad()) quads[activeQuad].m_maskPoints.clear();
+            if (hasActiveQuad()) {
+                quad& q = quads[activeQuad];
+                q.m_maskPoints.clear();
+                for (int i = 0; i < 4; i++) q.crop[i] = 0.0f;
+                q.circularCrop[0] = 0.5f;
+                q.circularCrop[1] = 0.5f;
+                q.circularCrop[2] = 0.0f;
+            }
         }
 
         if (m_resetGridFlag) {
@@ -1086,26 +1085,11 @@ void ofApp::windowResized(int w, int h)
             quads[i].screenFactorY = y_ratio;
             quads[i].bHighlightCorner = false;
             quads[i].allocateFbo(w, h);
-            quadDimensionsReset(i);
             if (quads[i].bGrid) {
                 quads[i].gridSurfaceUpdate(true);
             }
         }
     }
-}
-
-//---------------------------------------------------------------
-void ofApp::quadDimensionsReset(int q)
-{
-    quads[q].quadW = ofGetWidth();
-    quads[q].quadH = ofGetHeight();
-}
-
-//---------------------------------------------------------------
-void ofApp::quadPlacementReset(int q)
-{
-    quads[q].quadDispX = 0;
-    quads[q].quadDispY = 0;
 }
 
 //---------------------------------------------------------------

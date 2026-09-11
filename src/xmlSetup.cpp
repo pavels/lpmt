@@ -26,10 +26,10 @@ void ofApp::saveCurrentSettingsToXMLFile(std::string xmlFilePath)
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":TIMELINE:ALPHA", quads[i].bTimelineAlpha);
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":TIMELINE:SLIDE", quads[i].bTimelineSlideChange);
 
-            xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:DISPX", quads[i].quadDispX);
-            xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:DISPY", quads[i].quadDispY);
-            xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:WIDTH", quads[i].quadW);
-            xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:HEIGHT", quads[i].quadH);
+            xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:REGION:X", quads[i].srcRegion[0]);
+            xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:REGION:Y", quads[i].srcRegion[1]);
+            xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:REGION:W", quads[i].srcRegion[2]);
+            xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:REGION:H", quads[i].srcRegion[3]);
 
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":IMG:LOADED_IMG", quads[i].loadedImg);
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":IMG:LOADED_IMG_PATH", quads[i].bgImg);
@@ -208,10 +208,10 @@ void ofApp::loadSettingsFromXMLFile(std::string xmlFilePath)
             quads[i].bTimelineAlpha = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":TIMELINE:ALPHA", 0);
             quads[i].bTimelineSlideChange = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":TIMELINE:SLIDE", 0);
 
-            quads[i].quadDispX = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:DISPX", 0);
-            quads[i].quadDispY = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:DISPY", 0);
-            quads[i].quadW = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:WIDTH", 0);
-            quads[i].quadH = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:HEIGHT", 0);
+            quads[i].srcRegion[0] = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:REGION:X", 0.0);
+            quads[i].srcRegion[1] = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:REGION:Y", 0.0);
+            quads[i].srcRegion[2] = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:REGION:W", 1.0);
+            quads[i].srcRegion[3] = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":CONTENT:REGION:H", 1.0);
 
             quads[i].imgBg = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":IMG:ACTIVE", 0);
             quads[i].loadedImg = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":IMG:LOADED_IMG", "", 0);

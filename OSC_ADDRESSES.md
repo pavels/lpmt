@@ -35,6 +35,8 @@ expected. Values are clamped to the same ranges as the corresponding GUI sliders
     img/hmirror, img/vmirror        mirror the image
     img/rotation <int>              0..3 = 0/90/180/270 degrees clockwise
     img/center                      center the content in the surface
+    img/region <x> <y> <w> <h>      part of the content to show, fractions 0 .. 1 (default 0 0 1 1)
+    img/region/x .. img/region/h    one component at a time
     img/fit, img/keepaspect         fit to surface / preserve aspect ratio
     img/mult/x, img/mult/y          scale, 0.1 .. 5.0
     img/color <r> <g> <b> <a>       colorize, each 0 .. 1
@@ -83,11 +85,6 @@ expected. Values are clamped to the same ranges as the corresponding GUI sliders
     edgeblend/luminance             -4 .. 4
     edgeblend/amount <l> <r> <t> <b>
     edgeblend/amount/left|right|top|bottom     each 0 .. 0.5
-
-    placement <x> <y>               content offset
-    placement/x, placement/y        -1600 .. 1600
-    placement/dimensions <w> <h>
-    placement/w, placement/h        0 .. 2400
 
     corners/<c> <x> <y>             c is 0 .. 3
     corners/<c>/x, corners/<c>/y

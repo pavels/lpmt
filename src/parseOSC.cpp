@@ -115,6 +115,7 @@ void addColor(std::map<std::string, SurfaceFn>& table, const std::string& path, 
 
 const char* const rectCropNames[4] = { "top", "right", "bottom", "left" };
 const char* const circCropNames[3] = { "x", "y", "radius" };
+const char* const regionNames[4] = { "x", "y", "w", "h" };
 
 std::map<std::string, SurfaceFn> buildSurfaceTable()
 {
@@ -171,17 +172,11 @@ std::map<std::string, SurfaceFn> buildSurfaceTable()
         q.edgeBlendAmountBottom = ofClamp(argFloat(m, 3, q.edgeBlendAmountBottom), 0.0f, 1.0f);
     };
 
-    addInt(t, "placement/x", &quad::quadDispX, -1600, 1600);
-    addInt(t, "placement/y", &quad::quadDispY, -1600, 1600);
-    addInt(t, "placement/w", &quad::quadW, 0, 2400);
-    addInt(t, "placement/h", &quad::quadH, 0, 2400);
-    t["placement"] = [](ofApp&, quad& q, const ofxOscMessage& m) {
-        q.quadDispX = argInt(m, 0, q.quadDispX);
-        q.quadDispY = argInt(m, 1, q.quadDispY);
-    };
-    t["placement/dimensions"] = [](ofApp&, quad& q, const ofxOscMessage& m) {
-        q.quadW = argInt(m, 0, q.quadW);
-        q.quadH = argInt(m, 1, q.quadH);
+    addFloatArray(t, "img/region", &quad::srcRegion, 4, regionNames);
+    t["img/region"] = [](ofApp&, quad& q, const ofxOscMessage& m) {
+        for (int i = 0; i < 4; i++) {
+            q.srcRegion[i] = ofClamp(argFloat(m, i, q.srcRegion[i]), 0.0f, 1.0f);
+        }
     };
 
     addBool(t, "video", &quad::videoBg, true);

@@ -112,10 +112,10 @@ void quad::reset()
     edgeBlendAmountTop = 0.0;
     edgeBlendAmountBottom = 0.0;
 
-    quadDispX = 0;
-    quadDispY = 0;
-    quadW = ofGetWidth();
-    quadH = ofGetHeight();
+    srcRegion[0] = 0.0f;
+    srcRegion[1] = 0.0f;
+    srcRegion[2] = 1.0f;
+    srcRegion[3] = 1.0f;
 
     bBlendModes = false;
     blendMode = 0;
@@ -478,12 +478,12 @@ void quad::draw(vector<LpmtVideoPlayer>& sharedVideos)
                     applyBlendmode();
                 }
                 if ((!bBezier && !bGrid)) {
-                    quadFbo.draw(0 + quadDispX, 0 + quadDispY, quadW, quadH);
+                    quadFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
                     edgeBlendShader->end();
                 } else {
                     targetFbo.begin();
                     ofClear(0.0, 0.0, 0.0, 0.0);
-                    quadFbo.draw(0 + quadDispX, 0 + quadDispY, quadW, quadH);
+                    quadFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
                     edgeBlendShader->end();
                     targetFbo.end();
 
@@ -515,12 +515,12 @@ void quad::draw(vector<LpmtVideoPlayer>& sharedVideos)
                         applyBlendmode();
                     }
                     if (!bBezier && !bGrid) {
-                        quadFbo.draw(0 + quadDispX, 0 + quadDispY, quadW, quadH);
+                        quadFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
                         maskShader->end();
                     } else {
                         targetFbo.begin();
                         ofClear(0.0, 0.0, 0.0, 0.0);
-                        quadFbo.draw(0 + quadDispX, 0 + quadDispY, quadW, quadH);
+                        quadFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
                         maskShader->end();
                         targetFbo.end();
 
@@ -543,7 +543,7 @@ void quad::draw(vector<LpmtVideoPlayer>& sharedVideos)
                     }
 
                     if (!bBezier && !bGrid) {
-                        quadFbo.draw(quadDispX, quadDispY, quadW, quadH);
+                        quadFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
                     } else {
                         drawDeformation(quadFbo.getTexture(), false);
                     }
@@ -562,7 +562,7 @@ void quad::draw(vector<LpmtVideoPlayer>& sharedVideos)
             //set ofColor to red with alpha
             //ofSetColor(255,100,100,180);
             ofSetColor(100, 139, 150, 160);
-            maskFbo.draw(0 + quadDispX, 0 + quadDispY, quadW, quadH);
+            maskFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
             ofDisableAlphaBlending();
         }
 
@@ -831,6 +831,9 @@ void quad::drawSurface(vector<LpmtVideoPlayer>& sharedVideos)
             ratio = ofVec2f(slides[nextSlideId].getWidth() / srcWidth, slides[nextSlideId].getHeight() / srcHeight);
         }
 
+        srcWidth *= srcRegion[2];
+        srcHeight *= srcRegion[3];
+
         const bool quarterTurn = (imgRotation % 2) == 1;
         float contentW, contentH;
         if (imageFit) {
@@ -966,18 +969,25 @@ bool quad::isValidContent(vector<LpmtVideoPlayer>& sharedVideos)
 }
 
 //--------------------------------------------------------------
+void quad::drawRegion(ofTexture& tex, float w, float h)
+{
+    const float tw = tex.getWidth();
+    const float th = tex.getHeight();
+    tex.drawSubsection(0, 0, w, h, srcRegion[0] * tw, srcRegion[1] * th, srcRegion[2] * tw, srcRegion[3] * th);
+}
+
 void quad::drawContent(float w, float h, vector<LpmtVideoPlayer>& sharedVideos)
 {
     if (colorBg) {
         blank.draw(0, 0, w, h);
     } else if (imgBg && img.getWidth() > 0) {
-        img.draw(0, 0, w, h);
+        drawRegion(img.getTexture(), w, h);
     } else if (camBg && hasCamera() && cams[camNumber].getWidth() > 0) {
-        cams[camNumber].getTexture().draw(0, 0, w, h);
+        drawRegion(cams[camNumber].getTexture(), w, h);
     } else if (ndiBg && hasNdi()) {
-        ndi.draw(0, 0, w, h);
+        drawRegion(ndi.getTexture(), w, h);
     } else if (videoBg && video.isLoaded()) {
-        video.draw(0, 0, w, h);
+        drawRegion(video.getTexture(), w, h);
     } else if (sharedVideoBg && hasSharedVideo(sharedVideos)) {
         float x1 = ofGetWidth();
         float y1 = ofGetHeight();
@@ -1008,14 +1018,14 @@ void quad::drawContent(float w, float h, vector<LpmtVideoPlayer>& sharedVideos)
             float h1 = sharedVideos[sharedVideoId].getHeight();
             sharedVideos[sharedVideoId].getTexture().drawSubsection(0, 0, ofGetWidth(), ofGetHeight(), x1 * w1, y1 * h1, (x2 - x1) * w1, (y2 - y1) * h1);
         } else {
-            sharedVideos[sharedVideoId].draw(0, 0, w, h);
+            drawRegion(sharedVideos[sharedVideoId].getTexture(), w, h);
         }
     } else if (slideshowBg && (slides.size() > 0)) {
 
         if ((currentSlideId < 0) || (currentSlideId >= (int)slides.size())) {
             currentSlideId = 0;
         }
-        slides[currentSlideId].draw(0, 0, w, h);
+        drawRegion(slides[currentSlideId].getTexture(), w, h);
 
         if (slideTimer > slideFramesDuration) {
             if (!bTimelineSlideChange) {
