@@ -130,6 +130,8 @@ std::map<std::string, SurfaceFn> buildSurfaceTable()
     addBool(t, "img", &quad::imgBg, true);
     addBool(t, "img/hmirror", &quad::imgHFlip);
     addBool(t, "img/vmirror", &quad::imgVFlip);
+    addInt(t, "img/rotation", &quad::imgRotation, 0, 3);
+    addBool(t, "img/center", &quad::imgCenter);
     addBool(t, "img/fit", &quad::imageFit);
     addBool(t, "img/keepaspect", &quad::imageKeepAspect);
     addFloat(t, "img/mult/x", &quad::imgMultX, 0.1f, 5.0f);

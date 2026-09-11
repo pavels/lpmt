@@ -43,6 +43,8 @@ void quad::reset()
 
     imgHFlip = false;
     imgVFlip = false;
+    imgRotation = 0;
+    imgCenter = false;
 
     camNumber = prevCamNumber = 0;
 
@@ -829,113 +831,67 @@ void quad::drawSurface(vector<LpmtVideoPlayer>& sharedVideos)
             ratio = ofVec2f(slides[nextSlideId].getWidth() / srcWidth, slides[nextSlideId].getHeight() / srcHeight);
         }
 
+        const bool quarterTurn = (imgRotation % 2) == 1;
+        float contentW, contentH;
         if (imageFit) {
-            float multX = 1.0;
-            float multY = 1.0;
-            float fitX = ofGetWidth() / srcWidth;
-            float fitY = ofGetHeight() / srcHeight;
-            if (imageKeepAspect) {
-                // we calculate the factor for fitting the image in quad respecting img aspect ratio
-                if (fitX >= fitY) {
-                    multX = fitY;
-                    multY = fitY;
-                } else {
-                    multX = fitX;
-                    multY = fitX;
-                }
-            } else {
-                // this is for stretching image to whole quad size
-                multX = fitX;
-                multY = fitY;
-            }
-
-            if (imgHFlip || imgVFlip) {
-                glPushMatrix();
-                if (imgHFlip && !imgVFlip) {
-                    ofTranslate(srcWidth * multX, 0);
-                    glScalef(-1, 1, 1);
-                } else if (imgVFlip && !imgHFlip) {
-                    ofTranslate(0, srcHeight * multY);
-                    glScalef(1, -1, 1);
-                } else {
-                    ofTranslate(srcWidth * multX, srcHeight * multY);
-                    glScalef(-1, -1, 1);
-                }
-            }
-
-            if (bUseSurfaceShader) {
-                surfaceShader->begin();
-                surfaceShader->setUniformTexture("tex", imageTex, 0);
-                surfaceShader->setUniformTexture("tex2", imageTex2, 1);
-                surfaceShader->setUniform1f("crossfade", fade);
-                surfaceShader->setUniform2f("ratio", ratio);
-                surfaceShader->setUniform1f("hue", hue);
-                surfaceShader->setUniform1f("sat", saturation);
-                surfaceShader->setUniform1f("luminance", luminance);
-                surfaceShader->setUniform1f("tintR", imgColorize.r * timelineRed);
-                surfaceShader->setUniform1f("tintG", imgColorize.g * timelineGreen);
-                surfaceShader->setUniform1f("tintB", imgColorize.b * timelineBlue);
-                surfaceShader->setUniform1f("tintA", imgColorize.a * timelineAlpha);
-                surfaceShader->setUniform1f("greenscreenR", colorGreenscreen.r);
-                surfaceShader->setUniform1f("greenscreenG", colorGreenscreen.g);
-                surfaceShader->setUniform1f("greenscreenB", colorGreenscreen.b);
-                if (bUseGreenscreen) {
-                    surfaceShader->setUniform1f("greenscreenT", thresholdGreenscreen / 255.0f);
-                } else {
-                    surfaceShader->setUniform1f("greenscreenT", 0.0f);
-                }
-
-                drawContent(srcWidth * multX, srcHeight * multY, sharedVideos);
-
-                surfaceShader->end();
-            } else {
-                drawContent(srcWidth * multX, srcHeight * multY, sharedVideos);
-            }
-
+            // fit the rotated footprint, then map the factors back onto the content's own axes
+            const float fitX = ofGetWidth() / (quarterTurn ? srcHeight : srcWidth);
+            const float fitY = ofGetHeight() / (quarterTurn ? srcWidth : srcHeight);
+            const float multX = imageKeepAspect ? std::min(fitX, fitY) : fitX;
+            const float multY = imageKeepAspect ? std::min(fitX, fitY) : fitY;
+            contentW = srcWidth * (quarterTurn ? multY : multX);
+            contentH = srcHeight * (quarterTurn ? multX : multY);
         } else {
-            if (imgHFlip || imgVFlip) {
-                glPushMatrix();
-                if (imgHFlip && !imgVFlip) {
-                    ofTranslate(srcWidth * imgMultX * screenFactorX, 0);
-                    glScalef(-1, 1, 1);
-                } else if (imgVFlip && !imgHFlip) {
-                    ofTranslate(0, srcHeight * imgMultY * screenFactorY);
-                    glScalef(1, -1, 1);
-                } else {
-                    ofTranslate(srcWidth * imgMultX * screenFactorX, srcHeight * imgMultY * screenFactorY);
-                    glScalef(-1, -1, 1);
-                }
-            }
+            contentW = srcWidth * imgMultX * screenFactorX;
+            contentH = srcHeight * imgMultY * screenFactorY;
+        }
+        const float footprintW = quarterTurn ? contentH : contentW;
+        const float footprintH = quarterTurn ? contentW : contentH;
 
-            if (bUseSurfaceShader) {
-                surfaceShader->begin();
-                surfaceShader->setUniformTexture("tex", imageTex, 0);
-                surfaceShader->setUniformTexture("tex2", imageTex2, 1);
-                surfaceShader->setUniform1f("crossfade", fade);
-                surfaceShader->setUniform2f("ratio", ratio);
-                surfaceShader->setUniform1f("hue", hue);
-                surfaceShader->setUniform1f("sat", saturation);
-                surfaceShader->setUniform1f("luminance", luminance);
-                surfaceShader->setUniform1f("tintR", imgColorize.r * timelineRed);
-                surfaceShader->setUniform1f("tintG", imgColorize.g * timelineGreen);
-                surfaceShader->setUniform1f("tintB", imgColorize.b * timelineBlue);
-                surfaceShader->setUniform1f("tintA", imgColorize.a * timelineAlpha);
-                surfaceShader->setUniform1f("greenscreenR", colorGreenscreen.r);
-                surfaceShader->setUniform1f("greenscreenG", colorGreenscreen.g);
-                surfaceShader->setUniform1f("greenscreenB", colorGreenscreen.b);
-                surfaceShader->setUniform1f("greenscreenT", thresholdGreenscreen / 255.0f);
-
-                drawContent(srcWidth * imgMultX * screenFactorX, srcHeight * imgMultY * screenFactorY, sharedVideos);
-
-                surfaceShader->end();
-            } else {
-                drawContent(srcWidth * imgMultX * screenFactorX, srcHeight * imgMultY * screenFactorY, sharedVideos);
-            }
+        glPushMatrix();
+        if (imgCenter) {
+            ofTranslate((ofGetWidth() - footprintW) / 2, (ofGetHeight() - footprintH) / 2);
+        }
+        if (imgHFlip) {
+            ofTranslate(footprintW, 0);
+            glScalef(-1, 1, 1);
+        }
+        if (imgVFlip) {
+            ofTranslate(0, footprintH);
+            glScalef(1, -1, 1);
+        }
+        switch (imgRotation) {
+            case 1: ofTranslate(footprintW, 0); ofRotateDeg(90); break;
+            case 2: ofTranslate(footprintW, footprintH); ofRotateDeg(180); break;
+            case 3: ofTranslate(0, footprintH); ofRotateDeg(270); break;
+            default: break;
         }
 
-        if (imgHFlip || imgVFlip) {
-            glPopMatrix();
+        if (bUseSurfaceShader) {
+            surfaceShader->begin();
+            surfaceShader->setUniformTexture("tex", imageTex, 0);
+            surfaceShader->setUniformTexture("tex2", imageTex2, 1);
+            surfaceShader->setUniform1f("crossfade", fade);
+            surfaceShader->setUniform2f("ratio", ratio);
+            surfaceShader->setUniform1f("hue", hue);
+            surfaceShader->setUniform1f("sat", saturation);
+            surfaceShader->setUniform1f("luminance", luminance);
+            surfaceShader->setUniform1f("tintR", imgColorize.r * timelineRed);
+            surfaceShader->setUniform1f("tintG", imgColorize.g * timelineGreen);
+            surfaceShader->setUniform1f("tintB", imgColorize.b * timelineBlue);
+            surfaceShader->setUniform1f("tintA", imgColorize.a * timelineAlpha);
+            surfaceShader->setUniform1f("greenscreenR", colorGreenscreen.r);
+            surfaceShader->setUniform1f("greenscreenG", colorGreenscreen.g);
+            surfaceShader->setUniform1f("greenscreenB", colorGreenscreen.b);
+            surfaceShader->setUniform1f("greenscreenT", bUseGreenscreen ? thresholdGreenscreen / 255.0f : 0.0f);
+
+            drawContent(contentW, contentH, sharedVideos);
+
+            surfaceShader->end();
+        } else {
+            drawContent(contentW, contentH, sharedVideos);
         }
+        glPopMatrix();
     }
 
 // kinect stuff ------------------------------------------------------------------------------

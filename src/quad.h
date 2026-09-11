@@ -164,6 +164,8 @@ public:
 
     bool imgHFlip;
     bool imgVFlip;
+    int imgRotation; // quarter turns clockwise, 0..3
+    bool imgCenter;
 
     bool bEdgeBlend;
 

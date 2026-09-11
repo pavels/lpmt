@@ -1,44 +1,25 @@
-KEY COMMANDS:
-=============
+GENERAL
+space - projection / setup mode   |   g - show/hide gui (hide it to edit with the mouse)
+f - fullscreen   |   w / SHIFT-w - window background from camera / image file   |   h - this help   |   CTRL-q - quit
+p / o - start / stop projection   |   r - resync videos, slideshows and transitions
+CTRL-s - save project to the startup file   |   F1..F4 or [ ] - gui pages
 
-'h' - display this help dialog
+SURFACES (setup mode)
+a - add   |   CTRL-x - delete   |   CTRL-SHIFT-x - delete all   |   < > - previous / next
++ - - raise / lower layer (gui hidden)   |   q - fill window   |   # $ - rotate 5 degrees
+CTRL-c / CTRL-v - copy / paste surface settings   |   * - swap camera RGBA/BGRA
 
-'a' - adds new quad
-'CTRL-x' - delete selected quad
-'CTRL-SHIFT-x' - delete all quads
-'>' - go to next quad
-'<' - go to previous quad
-'+' - raise active quad position in layers pile
-'-' - lower active quad position in layers pile
-'q' - fills window with active quad
-'1' - shows general settings page of gui
+CORNERS (setup mode, gui hidden, not in mask or deform mode)
+drag a corner; drag the center to move; drag the handle right of the center to rotate
+SHIFT-drag a corner - scale   |   CTRL-arrow - select corner   |   arrow / SHIFT-arrow - nudge 1 / 10 px
 
-CORNER EDITING WITH ARROW KEYS:
-(only in setup mode with the gui hidden - press 'g' - and not while
- mask-editing 'm' or bezier/grid-editing 'b' are active)
+MASK (m - toggle, gui hidden)
+click - add point   |   drag - move point   |   d - delete point under mouse
+F2 - delete last point   |   c - clear mask
 
-'CTRL-arrow' - select the corner in that direction
-'arrow' - move the selected corner by one pixel
-'SHIFT-arrow' - move the selected corner by ten pixels
+DEFORM (b - toggle, gui hidden; enable "Use bezier" or "Use grid" on page 2)
+drag - move a bezier / grid control point
 
-'g' - toggles gui (for quad warping with mouse gui must be switched off)
-'f' - toggles fullscreen mode
-'w' - toggles cam snapshot window background
-'m' - toggles mask-editing mode
-'b' - toggles surface bezier/grid warping editing mode
-
-'spacebar' - toggles projection/setup modes (in Timeline interface, space starts/stops the timeline playback
-'r' - resyncs all videos, color transitions and slideshows in all quads to starting point
-'p' - starts projection
-'o' - stops projection
-
-'F1' - selects general settings gui page
-'F2' - selects first gui page for active quad settings
-'F3' - selects second gui page for active quad settings
-'F4' - selects third gui page for active quad settings
-'F9'     - toggles timeline BPM reference grid
-'F10'    - toggles timeline interface
-'F11'    - toggles stage visibility under timeline
-'F12'    - play/stop timeline
-'CTRL-s' - saves the project to _lpmt_settings.xml (the file loaded at startup)
-'CTRL-q' - Quits the application
+TIMELINE (while shown, only these keys and F4 / CTRL-q work)
+F10 - show/hide timeline   |   space - play/pause   |   F12 - play/stop
+F9 - BPM grid   |   F11 - show/hide stage

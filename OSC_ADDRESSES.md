@@ -33,6 +33,8 @@ expected. Values are clamped to the same ranges as the corresponding GUI sliders
     img/blob <appid> <blob>         load an image from an OSC blob
     img/load                        open the image file dialog
     img/hmirror, img/vmirror        mirror the image
+    img/rotation <int>              0..3 = 0/90/180/270 degrees clockwise
+    img/center                      center the content in the surface
     img/fit, img/keepaspect         fit to surface / preserve aspect ratio
     img/mult/x, img/mult/y          scale, 0.1 .. 5.0
     img/color <r> <g> <b> <a>       colorize, each 0 .. 1

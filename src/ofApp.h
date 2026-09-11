@@ -87,6 +87,7 @@ public:
     void quadBezierSpherize(int q);
     void quadBezierSpherizeStrong(int q);
     void quadBezierReset(int q);
+    void quadCornersReset(int q);
 
     void openImageFile();
     void openVideoFile();
@@ -99,6 +100,8 @@ public:
     void raiseLayer();
     void lowerLayer();
     void toggleEditMode();
+    void setMaskEditMode(bool on);
+    void setDeformEditMode(bool on);
     void setEditMode(bool wanted);
     void setMaskSetup(bool wanted);
     void setFullscreen(bool wanted);
@@ -173,6 +176,9 @@ public:
     bool m_loadSharedVideo6Flag;
     bool m_loadSharedVideo7Flag;
     bool m_resetCurrentQuadFlag;
+    bool m_resetCornersFlag;
+    bool m_resetMaskFlag;
+    bool m_resetGridFlag;
     bool m_bezierSpherizeQuadFlag;
     bool m_bezierSpherizeQuadStrongFlag;
     bool m_bezierResetQuadFlag;

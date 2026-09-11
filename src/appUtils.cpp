@@ -309,12 +309,7 @@ void ofApp::setMaskSetup(bool wanted)
         return;
     }
 
-    maskSetup = wanted;
-    for (int i = 0; i < MAX_QUADS; i++) {
-        if (quads[i].initialized) {
-            quads[i].isMaskSetup = wanted;
-        }
-    }
+    setMaskEditMode(wanted);
 }
 
 //---------------------------------------------------------------

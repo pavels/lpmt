@@ -84,6 +84,9 @@ void GUI::setupPages()
     m_gui.addToggle("Keep aspect ratio", m_dummyBool);
     m_gui.addToggle("H mirror", m_dummyBool);
     m_gui.addToggle("V mirror", m_dummyBool);
+    std::string rotationArray[] = {"0", "90", "180", "270"};
+    m_gui.addComboBox("Rotation", m_dummyInt, 4, rotationArray);
+    m_gui.addToggle("Center", m_dummyBool);
     m_gui.addColorPicker("Colorize",&m_dummyFloat);
     m_gui.addSlider("Hue", m_dummyFloat, 0.0f, 1.0f);
     m_gui.addSlider("Saturation", m_dummyFloat, 0.0f, 1.0f);
@@ -142,6 +145,7 @@ void GUI::setupPages()
     m_gui.addToggle("Mask on/off", m_dummyBool);
     m_gui.addToggle("Invert mask", m_dummyBool);
     m_gui.addToggle("Draw mask outline", m_dummyBool);
+    m_gui.addButton("Reset mask", m_app->m_resetMaskFlag);
 
 
     // Page Two
@@ -167,6 +171,7 @@ void GUI::setupPages()
     m_gui.addToggle("Use grid", m_dummyBool);
     m_gui.addSlider("Grid rows", m_dummyInt, 2, 15);
     m_gui.addSlider("Grid columns", m_dummyInt, 2, 20);
+    m_gui.addButton("Reset grid", m_app->m_resetGridFlag);
 
     m_gui.addTitle("Bezier Deformation");
     m_gui.addToggle("Use bezier", m_dummyBool);
@@ -216,6 +221,7 @@ void GUI::setupPages()
     m_gui.addTitle("Corner 2");
     m_gui.addSlider("corner 2 X", m_dummyFloat, -1.0, 2.0);
     m_gui.addSlider("corner 2 Y", m_dummyFloat, -1.0, 2.0);
+    m_gui.addButton("Reset corners", m_app->m_resetCornersFlag);
 
     m_gui.addTitle("Crop").setNewColumn(true);
     m_gui.addToggle("Mask on/off", m_dummyBool);
@@ -257,6 +263,8 @@ void GUI::updatePages(quad& activeQuad)
     dynamic_cast<ofxSimpleGuiToggle*>(firstPage.findControlByName("Keep aspect ratio"))->value = &activeQuad.imageKeepAspect;
     dynamic_cast<ofxSimpleGuiToggle*>(firstPage.findControlByName("H mirror"))->value = &activeQuad.imgHFlip;
     dynamic_cast<ofxSimpleGuiToggle*>(firstPage.findControlByName("V mirror"))->value = &activeQuad.imgVFlip;
+    dynamic_cast<ofxSimpleGuiComboBox*>(firstPage.findControlByName("Rotation"))->m_selectedChoice = &activeQuad.imgRotation;
+    dynamic_cast<ofxSimpleGuiToggle*>(firstPage.findControlByName("Center"))->value = &activeQuad.imgCenter;
     dynamic_cast<ofxSimpleGuiColorPicker*>(firstPage.findControlByName("Colorize"))->value = &activeQuad.imgColorize.r;
 
     dynamic_cast<ofxSimpleGuiSliderFloat*>(firstPage.findControlByName("Hue"))->value = &activeQuad.hue;

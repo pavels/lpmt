@@ -76,6 +76,8 @@ void ofApp::saveCurrentSettingsToXMLFile(std::string xmlFilePath)
 
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":IMG:FLIP:H", quads[i].imgHFlip);
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":IMG:FLIP:V", quads[i].imgVFlip);
+            xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":IMG:ROTATION", quads[i].imgRotation);
+            xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":IMG:CENTER", quads[i].imgCenter);
 
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":SHARED_VIDEO:ACTIVE", quads[i].sharedVideoBg);
             xmlSettingsFile.setValue("QUADS:QUAD_" + ofToString(i) + ":SHARED_VIDEO:NUM", quads[i].sharedVideoNum);
@@ -225,6 +227,8 @@ void ofApp::loadSettingsFromXMLFile(std::string xmlFilePath)
 
             quads[i].imgHFlip = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":IMG:FLIP:H", 0);
             quads[i].imgVFlip = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":IMG:FLIP:V", 0);
+            quads[i].imgRotation = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":IMG:ROTATION", 0);
+            quads[i].imgCenter = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":IMG:CENTER", 0);
 
             quads[i].videoBg = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":VIDEO:ACTIVE", 0);
             quads[i].loadedVideo = xmlSettingsFile.getValue("QUADS:QUAD_" + ofToString(i) + ":VIDEO:LOADED_VIDEO", "", 0);

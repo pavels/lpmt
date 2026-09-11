@@ -107,6 +107,9 @@ void ofApp::setup()
     m_loadSharedVideo6Flag = false;
     m_loadSharedVideo7Flag = false;
     m_resetCurrentQuadFlag = false;
+    m_resetCornersFlag = false;
+    m_resetMaskFlag = false;
+    m_resetGridFlag = false;
     m_bezierSpherizeQuadFlag = false;
     m_bezierSpherizeQuadStrongFlag = false;
     m_bezierResetQuadFlag = false;
@@ -252,6 +255,21 @@ void ofApp::prepare()
             m_resetCurrentQuadFlag = false;
             quadDimensionsReset(activeQuad);
             quadPlacementReset(activeQuad);
+        }
+
+        if (m_resetCornersFlag) {
+            m_resetCornersFlag = false;
+            if (hasActiveQuad()) quadCornersReset(activeQuad);
+        }
+
+        if (m_resetMaskFlag) {
+            m_resetMaskFlag = false;
+            if (hasActiveQuad()) quads[activeQuad].m_maskPoints.clear();
+        }
+
+        if (m_resetGridFlag) {
+            m_resetGridFlag = false;
+            if (hasActiveQuad()) quads[activeQuad].gridSurfaceUpdate(true);
         }
 
         //check if quad bezier spherize button in the GUI was pressed
@@ -423,6 +441,9 @@ void ofApp::draw()
             if (maskSetup) {
                 ofSetHexColor(0xFF0000);
                 ttf.drawString("Mask-editing mode ", 170, ofGetHeight() - 25);
+            } else if (gridSetup) {
+                ofSetHexColor(0xFF0000);
+                ttf.drawString("Deform-editing mode ", 170, ofGetHeight() - 25);
             }
             // draws gui
             m_gui.draw();
@@ -619,36 +640,16 @@ void ofApp::keyPressed(ofKeyEventArgs& args)
         setFullscreen(!bFullscreen);
     } else if ((args.key == 'g' || args.key == 'G') && !bTimeline) // toggles gui
     {
-        if (maskSetup) {
-            maskSetup = false;
-            for (int i = 0; i < MAX_QUADS; i++) {
-                if (quads[i].initialized) {
-                    quads[i].isMaskSetup = false;
-                }
-            }
-        }
+        setMaskEditMode(false);
+        setDeformEditMode(false);
         m_gui.toggleDraw();
         bGui = !bGui;
     } else if ((args.key == 'm' || args.key == 'M') && !bTimeline) // toggles mask editing
     {
-        if (!bGui) {
-            maskSetup = !maskSetup;
-            for (int i = 0; i < MAX_QUADS; i++) {
-                if (quads[i].initialized) {
-                    quads[i].isMaskSetup = !quads[i].isMaskSetup;
-                }
-            }
-        }
+        if (!bGui) setMaskEditMode(!maskSetup);
     } else if ((args.key == 'b' || args.key == 'B') && !bTimeline) // toggles bezier deformation editing
     {
-        if (!bGui) {
-            gridSetup = !gridSetup;
-            for (int i = 0; i < MAX_QUADS; i++) {
-                if (quads[i].initialized) {
-                    quads[i].isBezierSetup = !quads[i].isBezierSetup;
-                }
-            }
-        }
+        if (!bGui) setDeformEditMode(!gridSetup);
     } else if (args.key == '[' && !bTimeline) {
         m_gui.prevPage();
     } else if (args.key == ']' && !bTimeline) {
@@ -1156,6 +1157,14 @@ void ofApp::quadBezierSpherizeStrong(int q)
 }
 
 //---------------------------------------------------------------
+void ofApp::quadCornersReset(int q)
+{
+    quads[q].corners[0] = ofPoint(0.25, 0.25);
+    quads[q].corners[1] = ofPoint(0.75, 0.25);
+    quads[q].corners[2] = ofPoint(0.75, 0.75);
+    quads[q].corners[3] = ofPoint(0.25, 0.75);
+}
+
 void ofApp::quadBezierReset(int q)
 {
     quads[q].bBezier = true;
@@ -1272,12 +1281,8 @@ void ofApp::toggleEditMode()
         m_gui.hide();
         ofHideCursor();
         bGui = false;
-
-        for (int i = 0; i < MAX_QUADS; i++) {
-            if (quads[i].initialized) {
-                quads[i].isBezierSetup = false;
-            }
-        }
+        setMaskEditMode(false);
+        setDeformEditMode(false);
 
         for (int i = 0; i < MAX_QUADS; i++) {
             if (quads[i].initialized) {
@@ -1294,6 +1299,27 @@ void ofApp::toggleEditMode()
                 quads[i].isEditMode = true;
             }
         }
+    }
+}
+
+// the two edit modes are exclusive: mouse handling ignores everything while both flags are set
+void ofApp::setMaskEditMode(bool on)
+{
+    maskSetup = on;
+    if (on) gridSetup = false;
+    for (int i = 0; i < MAX_QUADS; i++) {
+        quads[i].isMaskSetup = on;
+        if (on) quads[i].isBezierSetup = false;
+    }
+}
+
+void ofApp::setDeformEditMode(bool on)
+{
+    gridSetup = on;
+    if (on) maskSetup = false;
+    for (int i = 0; i < MAX_QUADS; i++) {
+        quads[i].isBezierSetup = on;
+        if (on) quads[i].isMaskSetup = false;
     }
 }
 
