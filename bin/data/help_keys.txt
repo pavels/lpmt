@@ -13,11 +13,11 @@ CORNERS (setup mode, gui hidden, not in mask or deform mode)
 drag a corner; drag the center to move; drag the handle right of the center to rotate
 SHIFT-drag a corner - scale   |   CTRL-arrow - select corner   |   arrow / SHIFT-arrow - nudge 1 / 10 px
 
-MASK (m - toggle, gui hidden)
+MASK (m - toggle; setup mode, gui hidden)
 click - add point   |   drag - move point   |   d - delete point under mouse
 F2 - delete last point   |   c - clear mask
 
-DEFORM (b - toggle, gui hidden; enable "Use bezier" or "Use grid" on page 2)
+DEFORM (b - toggle; setup mode, gui hidden; enable "Use bezier" or "Use grid" on page 2)
 drag - move a bezier / grid control point
 
 TIMELINE (while shown, only these keys and F4 / CTRL-q work)

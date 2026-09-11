@@ -305,7 +305,7 @@ void ofApp::setEditMode(bool wanted)
 //---------------------------------------------------------------
 void ofApp::setMaskSetup(bool wanted)
 {
-    if (bGui) {
+    if (bGui || !isEditMode) {
         return;
     }
 

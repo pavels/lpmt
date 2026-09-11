@@ -646,10 +646,10 @@ void ofApp::keyPressed(ofKeyEventArgs& args)
         bGui = !bGui;
     } else if ((args.key == 'm' || args.key == 'M') && !bTimeline) // toggles mask editing
     {
-        if (!bGui) setMaskEditMode(!maskSetup);
+        if (isEditMode && !bGui) setMaskEditMode(!maskSetup);
     } else if ((args.key == 'b' || args.key == 'B') && !bTimeline) // toggles bezier deformation editing
     {
-        if (!bGui) setDeformEditMode(!gridSetup);
+        if (isEditMode && !bGui) setDeformEditMode(!gridSetup);
     } else if (args.key == '[' && !bTimeline) {
         m_gui.prevPage();
     } else if (args.key == ']' && !bTimeline) {
@@ -813,7 +813,7 @@ void ofApp::mouseMoved(int x, int y)
         }
     }
 
-    else if (maskSetup && !gridSetup && !bTimeline) {
+    else if (isEditMode && maskSetup && !gridSetup && !bTimeline) {
         float smallestDist = std::sqrt(ofGetWidth() * ofGetWidth() + ofGetHeight() * ofGetHeight());
         int whichPoint = -1;
         const ofPoint warpedMousePosition = quads[activeQuad].getWarpedPoint(mousePosition);
@@ -838,7 +838,7 @@ void ofApp::mouseMoved(int x, int y)
         }
     }
 
-    else if (gridSetup && !maskSetup && !bTimeline) {
+    else if (isEditMode && gridSetup && !maskSetup && !bTimeline) {
         float smallestDist = std::sqrt(ofGetWidth() * ofGetWidth() + ofGetHeight() * ofGetHeight());
         int whichPointRow = -1;
         int whichPointCol = -1;
@@ -965,7 +965,7 @@ void ofApp::mouseDragged(int x, int y, int button)
                 }
             }
         }
-    } else if (maskSetup && quads[activeQuad].bHighlightMaskPoint && !bTimeline) {
+    } else if (isEditMode && maskSetup && quads[activeQuad].bHighlightMaskPoint && !bTimeline) {
         // in mask setup mode, move the selected mask point
         const ofPoint warpedPoint = quads[activeQuad].getWarpedPoint(mousePosition);
         const ofPoint normalizedWarpedPoint = Util::normalizePoint(warpedPoint);
@@ -976,7 +976,7 @@ void ofApp::mouseDragged(int x, int y, int button)
         }
     }
 
-    else if (gridSetup && quads[activeQuad].bHighlightCtrlPoint && !bTimeline) {
+    else if (isEditMode && gridSetup && quads[activeQuad].bHighlightCtrlPoint && !bTimeline) {
         const int currentRow = quads[activeQuad].highlightedCtrlPointRow;
         const int currentCol = quads[activeQuad].highlightedCtrlPointCol;
         const ofPoint warpedPoint = quads[activeQuad].getWarpedPoint(mousePosition);
