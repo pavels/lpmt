@@ -1538,7 +1538,7 @@ void ofApp::setupKinect()
 // let the user choose an .xml project file with all the quads settings and loads it
 void ofApp::loadProject()
 {
-    ofFileDialogResult dialogResult = ofSystemLoadDialog("Load project file (.xml)");
+    ofFileDialogResult dialogResult = loadDialog("Load project file (.xml)");
 
     if (dialogResult.bSuccess) {
         loadSettingsFromXMLFile(dialogResult.getPath());

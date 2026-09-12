@@ -1,10 +1,23 @@
 #include "ofApp.h"
 
 //-----------------------------------------------------------
+// opens in the folder of the last pick, starting from the home directory
+ofFileDialogResult ofApp::loadDialog(const std::string& title, bool folderSelection)
+{
+    static std::string lastDir = ofFilePath::getUserHomeDir();
+
+    ofFileDialogResult result = ofSystemLoadDialog(title, folderSelection, lastDir);
+    if (result.bSuccess) {
+        lastDir = folderSelection ? result.getPath() : ofFilePath::getEnclosingDirectory(result.getPath(), false);
+    }
+    return result;
+}
+
+//-----------------------------------------------------------
 void ofApp::openImageFile()
 {
     ofLogNotice() << "Open Image file dialogue";
-    ofFileDialogResult dialog_result = ofSystemLoadDialog("Load image file");
+    ofFileDialogResult dialog_result = loadDialog("Load image file");
 
     if (dialog_result.bSuccess) {
         quads[activeQuad].loadImageFromFile(dialog_result.getName(), dialog_result.getPath());
@@ -15,7 +28,7 @@ void ofApp::openImageFile()
 //-----------------------------------------------------------
 void ofApp::openVideoFile()
 {
-    ofFileDialogResult dialog_result = ofSystemLoadDialog("Load video file");
+    ofFileDialogResult dialog_result = loadDialog("Load video file");
 
     if (dialog_result.bSuccess) {
         quads[activeQuad].loadVideoFromFile(dialog_result.getName(), dialog_result.getPath());
@@ -26,7 +39,7 @@ void ofApp::openVideoFile()
 //-----------------------------------------------------------
 void ofApp::loadSlideshow()
 {
-    ofFileDialogResult dialog_result = ofSystemLoadDialog("Find slideshow folder", true, "data"); // TODO: test if the default path works on linux, it doesn't seem to on windows
+    ofFileDialogResult dialog_result = loadDialog("Find slideshow folder", true);
 
     if (dialog_result.bSuccess) {
         const std::string slideshowFolderName = dialog_result.getPath();
@@ -38,7 +51,7 @@ void ofApp::loadSlideshow()
 //-----------------------------------------------------------
 void ofApp::openSharedVideoFile(int i)
 {
-    ofFileDialogResult dialog_result = ofSystemLoadDialog("Load shared video file");
+    ofFileDialogResult dialog_result = loadDialog("Load shared video file");
     if (dialog_result.bSuccess) {
         if (sharedVideos[i].isLoaded()) {
             sharedVideos[i].closeMovie();
@@ -75,7 +88,7 @@ void ofApp::openSharedVideoFile(std::string path, int i)
 ofImage ofApp::loadImageFromFile()
 {
     ofImage img;
-    ofFileDialogResult dialog_result = ofSystemLoadDialog("Load image file", false);
+    ofFileDialogResult dialog_result = loadDialog("Load image file");
     if (dialog_result.bSuccess) {
         string imgName = dialog_result.getName();
         string imgPath = dialog_result.getPath();

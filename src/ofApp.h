@@ -94,6 +94,7 @@ public:
     void openSharedVideoFile(string path, int i);
 
     void loadProject();
+    ofFileDialogResult loadDialog(const std::string& title, bool folderSelection = false);
     void saveProject();
     void raiseLayer();
     void lowerLayer();
