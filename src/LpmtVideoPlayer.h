@@ -7,12 +7,8 @@
 class LpmtVideoPlayer {
 public:
     LpmtVideoPlayer();
-    ~LpmtVideoPlayer();
 
-    LpmtVideoPlayer(const LpmtVideoPlayer&)            = default;
-    LpmtVideoPlayer(LpmtVideoPlayer&&) noexcept        = default;
-    LpmtVideoPlayer& operator=(const LpmtVideoPlayer&) = default;
-    LpmtVideoPlayer& operator=(LpmtVideoPlayer&&)      = default;
+    // copies share the backend, like ofVideoPlayer; see copyQuadSettings
 
     void load(const std::string& path);
     void play();

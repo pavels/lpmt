@@ -179,6 +179,15 @@ void ofApp::copyQuadSettings(int sourceQuad)
         quads[activeQuad].quadNumber = quadNumber;
         quads[activeQuad].isActive = true;
 
+        // the player and receiver wrappers share their backend on copy, so give the paste its own
+        quad& pasted = quads[activeQuad];
+        pasted.video = LpmtVideoPlayer();
+        pasted.previousSpeed = 1.0; // update() only pushes the speed on change
+        if (pasted.videoBg && !pasted.bgVideo.empty()) {
+            pasted.loadVideoFromFile(pasted.loadedVideo, pasted.bgVideo);
+        }
+        pasted.ndi = LpmtNdiSource(); // update() reconnects from ndiSourceName
+
         for (int i = 0; i < 4; i++) {
             quads[activeQuad].corners[i] = corners[i];
         }

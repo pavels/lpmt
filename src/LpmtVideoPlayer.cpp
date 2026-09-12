@@ -1,7 +1,6 @@
 #include "LpmtVideoPlayerImpl.h"
 
 LpmtVideoPlayer::LpmtVideoPlayer()  : impl(makeLpmtVideoPlayerImpl()) {}
-LpmtVideoPlayer::~LpmtVideoPlayer() = default;
 
 void LpmtVideoPlayer::load(const std::string& path) { impl->load(path); }
 void LpmtVideoPlayer::play()          { impl->play();  }

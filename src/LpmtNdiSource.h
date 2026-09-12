@@ -8,14 +8,8 @@
 class LpmtNdiSource {
 public:
     LpmtNdiSource();
-    ~LpmtNdiSource();
 
-    // a copied surface gets its own receiver - sharing one would make both
-    // surfaces fight over the sender name
-    LpmtNdiSource(const LpmtNdiSource&);
-    LpmtNdiSource& operator=(const LpmtNdiSource&);
-    LpmtNdiSource(LpmtNdiSource&&) noexcept = default;
-    LpmtNdiSource& operator=(LpmtNdiSource&&) noexcept = default;
+    // copies share the receiver; see copyQuadSettings
 
     void setSource(const std::string& name);
     const std::string& source() const;

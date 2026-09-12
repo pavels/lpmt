@@ -115,21 +115,6 @@ struct LpmtNdiSource::Impl {
 };
 
 LpmtNdiSource::LpmtNdiSource() = default;
-LpmtNdiSource::~LpmtNdiSource() = default;
-
-LpmtNdiSource::LpmtNdiSource(const LpmtNdiSource& other)
-{
-    setSource(other.source());
-}
-
-LpmtNdiSource& LpmtNdiSource::operator=(const LpmtNdiSource& other)
-{
-    if (this != &other) {
-        impl.reset();
-        setSource(other.source());
-    }
-    return *this;
-}
 
 void LpmtNdiSource::setSource(const std::string& name)
 {
