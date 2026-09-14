@@ -4,6 +4,18 @@
     <ClCompile Include="src\ofApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\LpmtNdiSource.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LpmtVideoPlayer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LpmtVideoPlayerGst.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LpmtVideoPlayerOf.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -71,12 +83,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\kinectManager.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ofApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\parseMIDI.cpp">
@@ -234,6 +240,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\addons\ofxMidi\libs\rtmidi\RtMidi.cpp">
       <Filter>addons\ofxMidi\libs\rtmidi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxNDI\src\ofxNDIdynloader.cpp">
+      <Filter>addons\ofxNDI\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxNetworkUtils.cpp">
       <Filter>addons\ofxNetwork\src</Filter>
@@ -438,6 +447,21 @@
     <Filter Include="addons\ofxMidi\libs\rtmidi">
       <UniqueIdentifier>{8E6C5628-3502-6F01-4B1D-AEAE}</UniqueIdentifier>
     </Filter>
+    <Filter Include="addons\ofxNDI">
+      <UniqueIdentifier>{F5FD4AA9-F984-4378-BE46-2E01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxNDI\src">
+      <UniqueIdentifier>{00135C8A-D400-46BB-AEBD-BA3B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxNDI\libs">
+      <UniqueIdentifier>{DDC1A185-E30E-409C-8BB1-0075}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxNDI\libs\NDI">
+      <UniqueIdentifier>{EDEF1AB9-DBEE-411B-B3D5-7C16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxNDI\libs\NDI\include">
+      <UniqueIdentifier>{4CA596FE-48C1-49D0-B7B0-F8C3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="addons\ofxNetwork">
       <UniqueIdentifier>{01A15744-29A6-108D-08E9-83A7}</UniqueIdentifier>
     </Filter>
@@ -629,6 +653,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\LpmtNdiSource.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LpmtVideoPlayer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LpmtVideoPlayerImpl.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="src\ofApp.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -643,9 +676,6 @@
     </ClInclude>
     <ClInclude Include="src\addons\ofxTextInputField.h">
       <Filter>src\addons</Filter>
-    </ClInclude>
-    <ClInclude Include="src\config.h">
-      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\gui\Controls\ofxSimpleGuiButton.h">
       <Filter>src\gui\Controls</Filter>
@@ -708,9 +738,6 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\kinectManager.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ofApp.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\quad.h">
@@ -889,6 +916,63 @@
     </ClInclude>
     <ClInclude Include="..\..\..\addons\ofxMidi\libs\rtmidi\RtMidi.h">
       <Filter>addons\ofxMidi\libs\rtmidi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\src\ofxNDIdynloader.h">
+      <Filter>addons\ofxNDI\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\src\ofxNDIplatforms.h">
+      <Filter>addons\ofxNDI\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.DynamicLoad.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.Find.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.FrameSync.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.Lib.cplusplus.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.Lib.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.Recv.ex.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.Recv.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.RecvAdvertiser.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.RecvListener.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.Routing.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.Send.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.SendAdvertiser.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.SendListener.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.compat.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.deprecated.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.structs.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNDI\libs\NDI\include\Processing.NDI.utilities.h">
+      <Filter>addons\ofxNDI\libs\NDI\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxNetwork.h">
       <Filter>addons\ofxNetwork\src</Filter>

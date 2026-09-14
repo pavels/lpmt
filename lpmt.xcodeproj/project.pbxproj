@@ -12908,13 +12908,6 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
-			<key>480230FFB6AFF9B18855EE09</key>
-			<dict>
-				<key>fileRef</key>
-				<string>76633BFF0DEC1254811C84AA</string>
-				<key>isa</key>
-				<string>PBXBuildFile</string>
-			</dict>
 			<key>328594985FE3F60026D08319</key>
 			<dict>
 				<key>explicitFileType</key>
@@ -12966,13 +12959,6 @@
 				<string>src/timeline/ofxHotKeys.h</string>
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>0379017B3DE4E3B7169D6B2A</key>
-			<dict>
-				<key>fileRef</key>
-				<string>E616844004C8E2981E49E2D4</string>
-				<key>isa</key>
-				<string>PBXBuildFile</string>
 			</dict>
 			<key>CE51E8513E7AE758672D0951</key>
 			<dict>
@@ -13122,13 +13108,9 @@
 				<array>
 					<string>EB25CD1879896BBB121B47E2</string>
 					<string>4AC1285F460B68AF792762B5</string>
-					<string>E616844004C8E2981E49E2D4</string>
-					<string>D23A35B76559E5381372B03B</string>
 					<string>6F7C9935718DCDD85B9F41FD</string>
 					<string>5CBD400609980B9B095F9F47</string>
 					<string>328594985FE3F60026D08319</string>
-					<string>76633BFF0DEC1254811C84AA</string>
-					<string>22078A6441BDBFB5E24FDA90</string>
 					<string>DB6FBC9B468B52A7ED3A38B8</string>
 					<string>2E87F6C7CBED84955B8051CC</string>
 					<string>9EC051BD654ED439652CA795</string>
@@ -14971,6 +14953,10 @@ fi
 						<string>../../../addons/ofxMidi/src</string>
 						<string>../../../addons/ofxMidi/src/desktop</string>
 						<string>../../../addons/ofxMidi/src/ios</string>
+						<string>../../../addons/ofxNDI/libs</string>
+						<string>../../../addons/ofxNDI/libs/NDI</string>
+						<string>../../../addons/ofxNDI/libs/NDI/include</string>
+						<string>../../../addons/ofxNDI/src</string>
 						<string>../../../addons/ofxNetwork/src</string>
 						<string>../../../addons/ofxOpenCv/libs</string>
 						<string>../../../addons/ofxOpenCv/libs/opencv</string>
@@ -15125,6 +15111,10 @@ fi
 						<string>../../../addons/ofxMidi/src</string>
 						<string>../../../addons/ofxMidi/src/desktop</string>
 						<string>../../../addons/ofxMidi/src/ios</string>
+						<string>../../../addons/ofxNDI/libs</string>
+						<string>../../../addons/ofxNDI/libs/NDI</string>
+						<string>../../../addons/ofxNDI/libs/NDI/include</string>
+						<string>../../../addons/ofxNDI/src</string>
 						<string>../../../addons/ofxNetwork/src</string>
 						<string>../../../addons/ofxOpenCv/libs</string>
 						<string>../../../addons/ofxOpenCv/libs/opencv</string>
@@ -15259,6 +15249,7 @@ fi
 				<array>
 					<string>9683228C705CA3FF4F2EA945</string>
 					<string>2413C01760B1811BED0F502D</string>
+					<string>D75023216A714A06BA35E63A</string>
 					<string>18240ECCE4076FB0833A8578</string>
 					<string>A0B90D3B0ADB9C1716816714</string>
 					<string>E6053AB7FEC63D5F83825B88</string>
@@ -18054,6 +18045,10 @@ fi
 						<string>../../../addons/ofxMidi/src</string>
 						<string>../../../addons/ofxMidi/src/desktop</string>
 						<string>../../../addons/ofxMidi/src/ios</string>
+						<string>../../../addons/ofxNDI/libs</string>
+						<string>../../../addons/ofxNDI/libs/NDI</string>
+						<string>../../../addons/ofxNDI/libs/NDI/include</string>
+						<string>../../../addons/ofxNDI/src</string>
 						<string>../../../addons/ofxNetwork/src</string>
 						<string>../../../addons/ofxOpenCv/libs</string>
 						<string>../../../addons/ofxOpenCv/libs/opencv</string>
@@ -18227,6 +18222,10 @@ fi
 						<string>../../../addons/ofxMidi/src</string>
 						<string>../../../addons/ofxMidi/src/desktop</string>
 						<string>../../../addons/ofxMidi/src/ios</string>
+						<string>../../../addons/ofxNDI/libs</string>
+						<string>../../../addons/ofxNDI/libs/NDI</string>
+						<string>../../../addons/ofxNDI/libs/NDI/include</string>
+						<string>../../../addons/ofxNDI/src</string>
 						<string>../../../addons/ofxNetwork/src</string>
 						<string>../../../addons/ofxOpenCv/libs</string>
 						<string>../../../addons/ofxOpenCv/libs/opencv</string>
@@ -18381,9 +18380,7 @@ fi
 					<string>0D58716DDFBA61CF023B882C</string>
 					<string>7723BF4FD765EA0CC4EE1E6F</string>
 					<string>CE51E8513E7AE758672D0951</string>
-					<string>0379017B3DE4E3B7169D6B2A</string>
 					<string>DA772C53519CFE05BD1EDA8D</string>
-					<string>480230FFB6AFF9B18855EE09</string>
 					<string>413A7E5D7EC2FCB1E620AD57</string>
 					<string>5E859B20B634C5B36595D268</string>
 					<string>2725A18BA671367142F24371</string>
@@ -18459,6 +18456,11 @@ fi
 					<string>9D44DC88EF9E7991B4A09951</string>
 					<string>5A4349E9754D6FA14C0F2A3A</string>
 					<string>63B57AC5BF4EF088491E0317</string>
+					<string>8B1C853AC13E4D30997014FF</string>
+					<string>5B797CCDB00D4C42B50E7732</string>
+					<string>E4817E9BFA474674876898A8</string>
+					<string>C86DFD4C124B4094A69E10B0</string>
+					<string>246F9FF753FA4077A2C85C35</string>
 				</array>
 				<key>isa</key>
 				<string>PBXSourcesBuildPhase</string>
@@ -18471,7 +18473,6 @@ fi
 				<string>2147483647</string>
 				<key>files</key>
 				<array>
-					<string>E4328149138ABC9F0047C5CB</string>
 					<string>631702104AFC104323A9EB79</string>
 				</array>
 				<key>isa</key>
@@ -18585,6 +18586,10 @@ fi
 						<string>../../../addons/ofxMidi/src</string>
 						<string>../../../addons/ofxMidi/src/desktop</string>
 						<string>../../../addons/ofxMidi/src/ios</string>
+						<string>../../../addons/ofxNDI/libs</string>
+						<string>../../../addons/ofxNDI/libs/NDI</string>
+						<string>../../../addons/ofxNDI/libs/NDI/include</string>
+						<string>../../../addons/ofxNDI/src</string>
 						<string>../../../addons/ofxNetwork/src</string>
 						<string>../../../addons/ofxOpenCv/libs</string>
 						<string>../../../addons/ofxOpenCv/libs/opencv</string>
@@ -18759,6 +18764,10 @@ fi
 						<string>../../../addons/ofxMidi/src</string>
 						<string>../../../addons/ofxMidi/src/desktop</string>
 						<string>../../../addons/ofxMidi/src/ios</string>
+						<string>../../../addons/ofxNDI/libs</string>
+						<string>../../../addons/ofxNDI/libs/NDI</string>
+						<string>../../../addons/ofxNDI/libs/NDI/include</string>
+						<string>../../../addons/ofxNDI/src</string>
 						<string>../../../addons/ofxNetwork/src</string>
 						<string>../../../addons/ofxOpenCv/libs</string>
 						<string>../../../addons/ofxOpenCv/libs/opencv</string>
@@ -18911,6 +18920,13 @@ fi
 					<string>3552B997BBE6876739E954F8</string>
 					<string>F80608BEE4031E70CC0ED6F5</string>
 					<string>A5C1DEA9DD4238AF07BAD633</string>
+					<string>1F1E5FA20C86483C9E93E296</string>
+					<string>2DF3B6DBD1544CBCAAFCFEEA</string>
+					<string>BABB17EF18634199A805B81E</string>
+					<string>6A1371A7C051415EAB7CF37B</string>
+					<string>0946C63289FA442C85CD051D</string>
+					<string>972D43AE01BC4ABD84E201CE</string>
+					<string>380C92F5877C46A5B0C74A5F</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
@@ -19043,6 +19059,530 @@ echo "$GCC_PREPROCESSOR_DEFINITIONS";
 				<string>text.xcconfig</string>
 				<key>path</key>
 				<string>Project.xcconfig</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>1F1E5FA20C86483C9E93E296</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>LpmtNdiSource.cpp</string>
+				<key>path</key>
+				<string>src/LpmtNdiSource.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>8B1C853AC13E4D30997014FF</key>
+			<dict>
+				<key>fileRef</key>
+				<string>1F1E5FA20C86483C9E93E296</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>2DF3B6DBD1544CBCAAFCFEEA</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>LpmtNdiSource.h</string>
+				<key>path</key>
+				<string>src/LpmtNdiSource.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>BABB17EF18634199A805B81E</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>LpmtVideoPlayer.cpp</string>
+				<key>path</key>
+				<string>src/LpmtVideoPlayer.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>5B797CCDB00D4C42B50E7732</key>
+			<dict>
+				<key>fileRef</key>
+				<string>BABB17EF18634199A805B81E</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>6A1371A7C051415EAB7CF37B</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>LpmtVideoPlayer.h</string>
+				<key>path</key>
+				<string>src/LpmtVideoPlayer.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>0946C63289FA442C85CD051D</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>LpmtVideoPlayerGst.cpp</string>
+				<key>path</key>
+				<string>src/LpmtVideoPlayerGst.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>E4817E9BFA474674876898A8</key>
+			<dict>
+				<key>fileRef</key>
+				<string>0946C63289FA442C85CD051D</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>972D43AE01BC4ABD84E201CE</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>LpmtVideoPlayerImpl.h</string>
+				<key>path</key>
+				<string>src/LpmtVideoPlayerImpl.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>380C92F5877C46A5B0C74A5F</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>LpmtVideoPlayerOf.cpp</string>
+				<key>path</key>
+				<string>src/LpmtVideoPlayerOf.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>C86DFD4C124B4094A69E10B0</key>
+			<dict>
+				<key>fileRef</key>
+				<string>380C92F5877C46A5B0C74A5F</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>6E23EDE58F864C379A17D1F1</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.DynamicLoad.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.DynamicLoad.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>AA57ED8FDC3745DEB14971A0</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.Find.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.Find.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>B86E5F0F70F14126878BAEFC</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.FrameSync.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.FrameSync.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>1E4C382173E442CF8E724651</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.Lib.cplusplus.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.Lib.cplusplus.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>E5CAB0D15ACE4EC98E79475E</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.Lib.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.Lib.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>2182C3425B8E463DACCE6C3F</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.Recv.ex.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.Recv.ex.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>8519495DC5A14278B3236FD5</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.Recv.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.Recv.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>7F9E101A54DB4224A04F31E6</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.RecvAdvertiser.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.RecvAdvertiser.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>ECC4D0957ABA4B17AD58A367</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.RecvListener.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.RecvListener.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>B60FDDBCACBA4263A809A861</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.Routing.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.Routing.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>FACF3E0064634A5AA47F0E4D</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.Send.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.Send.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>E9083095D1E44D2C978B9B87</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.SendAdvertiser.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.SendAdvertiser.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>76A517E432B748B0AE5C03D2</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.SendListener.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.SendListener.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>7CA2A65C4003438CBAB0FACE</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.compat.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.compat.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>4C52BA9CAD13443294AA069E</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.deprecated.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.deprecated.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>EFADF07FA6FD4202949BDB9C</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.structs.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.structs.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>3E19F932A66F42BB8A107158</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Processing.NDI.utilities.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/libs/NDI/include/Processing.NDI.utilities.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>C484B35D7D234F3FB97C8BB3</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>6E23EDE58F864C379A17D1F1</string>
+					<string>AA57ED8FDC3745DEB14971A0</string>
+					<string>B86E5F0F70F14126878BAEFC</string>
+					<string>1E4C382173E442CF8E724651</string>
+					<string>E5CAB0D15ACE4EC98E79475E</string>
+					<string>2182C3425B8E463DACCE6C3F</string>
+					<string>8519495DC5A14278B3236FD5</string>
+					<string>7F9E101A54DB4224A04F31E6</string>
+					<string>ECC4D0957ABA4B17AD58A367</string>
+					<string>B60FDDBCACBA4263A809A861</string>
+					<string>FACF3E0064634A5AA47F0E4D</string>
+					<string>E9083095D1E44D2C978B9B87</string>
+					<string>76A517E432B748B0AE5C03D2</string>
+					<string>7CA2A65C4003438CBAB0FACE</string>
+					<string>4C52BA9CAD13443294AA069E</string>
+					<string>EFADF07FA6FD4202949BDB9C</string>
+					<string>3E19F932A66F42BB8A107158</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>include</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>9DDC80F1197A4C4D9DCEB2A6</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>C484B35D7D234F3FB97C8BB3</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>NDI</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>873D24390EB4435F8792E0CA</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>9DDC80F1197A4C4D9DCEB2A6</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>libs</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>BD388AC0D8F84960A0456B68</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxNDIdynloader.cpp</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/src/ofxNDIdynloader.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>246F9FF753FA4077A2C85C35</key>
+			<dict>
+				<key>fileRef</key>
+				<string>BD388AC0D8F84960A0456B68</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>33428B0962284A42956A5178</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxNDIdynloader.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/src/ofxNDIdynloader.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>F6C79373C57E40C3A74273F6</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxNDIplatforms.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxNDI/src/ofxNDIplatforms.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>8F2A96C99DBB44878E83DBDE</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>BD388AC0D8F84960A0456B68</string>
+					<string>33428B0962284A42956A5178</string>
+					<string>F6C79373C57E40C3A74273F6</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>src</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>D75023216A714A06BA35E63A</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>873D24390EB4435F8792E0CA</string>
+					<string>8F2A96C99DBB44878E83DBDE</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>ofxNDI</string>
 				<key>sourceTree</key>
 				<string>&lt;group&gt;</string>
 			</dict>
