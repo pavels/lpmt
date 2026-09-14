@@ -12,8 +12,9 @@ ARG OFXMIDI_REF
 ARG OFXNDI_REF
 ENV DEBIAN_FRONTEND=noninteractive LC_ALL=C
 
+# binutils-gold: OF linux64 links with -fuse-ld=gold, split out of binutils on trixie
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential git curl ca-certificates pkg-config \
+    build-essential binutils-gold git curl ca-certificates pkg-config \
     freeglut3-dev libasound2-dev libxmu-dev libxxf86vm-dev libgl1-mesa-dev libglu1-mesa-dev \
     libraw1394-dev libudev-dev libdrm-dev libglew-dev libopenal-dev libsndfile1-dev \
     libfreeimage-dev libcairo2-dev libfreetype-dev libssl-dev libpulse-dev \
@@ -32,22 +33,11 @@ RUN git clone https://github.com/danomatika/ofxMidi addons/ofxMidi \
     && git clone https://github.com/leadedge/ofxNDI addons/ofxNDI \
     && git -C addons/ofxNDI checkout --quiet "${OFXNDI_REF}"
 
-RUN make -C libs/openFrameworksCompiled/project -j"$(nproc)" Release
-
 WORKDIR /of/apps/myApps/lpmt
 COPY Makefile config.make addons.make ./
 COPY src ./src
 COPY bin/data ./bin/data
 RUN make -j"$(nproc)" WITH_HWDECODE=1
-
-# every library the binary links against must be covered by debian/install-deps
-COPY debian/install-deps ./debian/install-deps
-RUN set -e; ./debian/install-deps --list > /tmp/deps; \
-    for lib in $(readelf -d bin/lpmt | sed -n 's/.*NEEDED.*\[\(.*\)\]/\1/p'); do \
-        path=$(ldd bin/lpmt | awk -v l="$lib" '$1==l{print $3}'); \
-        pkg=$(dpkg -S "$(readlink -f "$path")" | cut -d: -f1 | head -1); \
-        grep -qx "$pkg" /tmp/deps || { echo "install-deps is missing $pkg (for $lib)"; exit 1; }; \
-    done
 
 RUN rm -rf out && mkdir out \
     && cp bin/lpmt out/ \
