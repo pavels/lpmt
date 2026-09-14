@@ -4,8 +4,6 @@
 #include "LpmtVideoPlayer.h"
 #include "LpmtNdiSource.h"
 
-//#define WITH_KINECT
-
 #ifdef WITH_KINECT
 #include "kinectManager.h"
 #include "ofxOpenCv.h"

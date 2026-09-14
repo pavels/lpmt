@@ -89,6 +89,11 @@
 ################################################################################
 # PROJECT_DEFINES =
 
+# Kinect needs the ofxKinect and ofxOpenCv addons, see addons.make
+ifdef WITH_KINECT
+    PROJECT_DEFINES += WITH_KINECT
+endif
+
 ifdef WITH_HWDECODE
     PROJECT_DEFINES += WITH_HWDECODE
     PROJECT_CFLAGS  += $(shell pkg-config --cflags gstreamer-1.0 gstreamer-gl-1.0 gstreamer-app-1.0 gstreamer-video-1.0)

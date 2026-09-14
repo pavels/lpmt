@@ -1,0 +1,16 @@
+#!/bin/sh
+# Builds LPMT for Debian 13 inside Docker and writes the deployable files to out/
+# (lpmt binary + data/). Extra arguments are passed to docker build, e.g. --no-cache.
+set -e
+cd "$(dirname "$0")/.."
+
+rm -rf out
+DOCKER_BUILDKIT=1 docker build \
+    --network host \
+    -f debian/Docker.build \
+    --target export \
+    --output type=local,dest=out \
+    "$@" .
+
+echo "Built files in $(pwd)/out:"
+ls -la out

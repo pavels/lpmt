@@ -1,0 +1,9 @@
+.git
+obj
+out
+bin/lpmt
+bin/lpmt_debug
+bin/libfmod.so
+bin/*.app
+bin/*.exe
+bin/*.dll

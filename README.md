@@ -42,8 +42,7 @@ git clone https://github.com/danomatika/ofxMidi
 git clone https://github.com/leadedge/ofxNDI
 ```
 
-All other addons are either core ones (`ofxKinect`, `ofxNetwork`, `ofxOpenCv`, `ofxOsc`,
-`ofxPoco`, `ofxXmlSettings`) or LPMT-specific versions embedded in `src/` (`ofxTimeline`,
+All other addons are either core ones (`ofxNetwork`, `ofxOsc`, `ofxPoco`, `ofxXmlSettings`) or LPMT-specific versions embedded in `src/` (`ofxTimeline`,
 `ofxSimpleGuiToo`, `ofxTween`, `ofxTimecode`, ...).
 
 Then clone this repository into `apps/myApps` (or any folder at the same depth):
@@ -78,7 +77,20 @@ Currently limited to MP4/H.264 files; audio is not played in this mode.
 A Qt Creator project (`lpmt.qbs`) is also provided. `.vscode/` contains IntelliSense settings
 for editing in VS Code.
 
-Kinect support is compiled out by default (`WITH_KINECT` in `ofApp.h` and `quad.h`).
+#### Debian 13 deployment
+`debian/` contains a Docker-based build that needs no openFrameworks install on the host:
+
+```
+debian/build                    # builds WITH_HWDECODE=1 in a debian:13 container, output in out/
+sudo debian/install-deps        # on the target machine: runtime packages (VA-API, GStreamer, avahi)
+```
+
+Copy `out/` (the `lpmt` binary and `data/`) anywhere on the target and run `./lpmt` from that
+directory. The NDI runtime is not installed by the script (license) — put `libndi.so` in
+`/usr/local/lib` yourself. The Dockerfile pins the openFrameworks release and the addon commits.
+
+Kinect support is off by default. `make WITH_KINECT=1` enables it; it also needs the `ofxKinect` and
+`ofxOpenCv` addons uncommented in `addons.make` (they are core addons, nothing to clone).
 
 ### Windows
 Visual Studio 2017 solution (`lpmt.sln`, toolset v141).

@@ -6,7 +6,6 @@
 // project file loaded on autostart and written by CTRL-s
 #define DEFAULT_PROJECT_FILE "_lpmt_settings.xml"
 
-//#define WITH_KINECT
 #define WITH_MIDI
 #ifdef TARGET_OSX
   //  #define WITH_SYPHON

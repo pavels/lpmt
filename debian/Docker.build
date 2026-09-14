@@ -1,0 +1,59 @@
+# syntax=docker/dockerfile:1
+# Builds LPMT (WITH_HWDECODE=1) for Debian 13. Used by debian/build; the "export"
+# stage holds only the deployable files (lpmt binary + data/).
+
+ARG OF_VERSION=0.12.1
+ARG OFXMIDI_REF=735f00ead8d043d3c9a399196c3abf8795bed827
+ARG OFXNDI_REF=1c98550976d83d53392514a805c9a6319d3e4dc3
+
+FROM debian:13 AS build
+ARG OF_VERSION
+ARG OFXMIDI_REF
+ARG OFXNDI_REF
+ENV DEBIAN_FRONTEND=noninteractive LC_ALL=C
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential git curl ca-certificates pkg-config \
+    freeglut3-dev libasound2-dev libxmu-dev libxxf86vm-dev libgl1-mesa-dev libglu1-mesa-dev \
+    libraw1394-dev libudev-dev libdrm-dev libglew-dev libopenal-dev libsndfile1-dev \
+    libfreeimage-dev libcairo2-dev libfreetype-dev libssl-dev libpulse-dev \
+    libgtk-3-dev libegl1-mesa-dev libgles2-mesa-dev libassimp-dev librtaudio-dev \
+    libglfw3-dev liburiparser-dev libcurl4-openssl-dev libpugixml-dev libpoco-dev brotli \
+    liblapack-dev libblas-dev libmpg123-dev libjack-dev libgudev-1.0-dev \
+    libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /of
+RUN curl -fsSL "https://github.com/openframeworks/openFrameworks/releases/download/${OF_VERSION}/of_v${OF_VERSION}_linux64_gcc6_release.tar.gz" \
+    | tar xz --strip-components=1
+
+RUN git clone https://github.com/danomatika/ofxMidi addons/ofxMidi \
+    && git -C addons/ofxMidi checkout --quiet "${OFXMIDI_REF}" \
+    && git clone https://github.com/leadedge/ofxNDI addons/ofxNDI \
+    && git -C addons/ofxNDI checkout --quiet "${OFXNDI_REF}"
+
+RUN make -C libs/openFrameworksCompiled/project -j"$(nproc)" Release
+
+WORKDIR /of/apps/myApps/lpmt
+COPY Makefile config.make addons.make ./
+COPY src ./src
+COPY bin/data ./bin/data
+RUN make -j"$(nproc)" WITH_HWDECODE=1
+
+# every library the binary links against must be covered by debian/install-deps
+COPY debian/install-deps ./debian/install-deps
+RUN set -e; ./debian/install-deps --list > /tmp/deps; \
+    for lib in $(readelf -d bin/lpmt | sed -n 's/.*NEEDED.*\[\(.*\)\]/\1/p'); do \
+        path=$(ldd bin/lpmt | awk -v l="$lib" '$1==l{print $3}'); \
+        pkg=$(dpkg -S "$(readlink -f "$path")" | cut -d: -f1 | head -1); \
+        grep -qx "$pkg" /tmp/deps || { echo "install-deps is missing $pkg (for $lib)"; exit 1; }; \
+    done
+
+RUN rm -rf out && mkdir out \
+    && cp bin/lpmt out/ \
+    && cp -r bin/data out/data \
+    && rm -rf out/data/_lpmt_settings.xml out/data/config.xml out/data/timeline/*.xml \
+              out/data/rgba2yuv out/data/yuv2rgba
+
+FROM scratch AS export
+COPY --from=build /of/apps/myApps/lpmt/out /
