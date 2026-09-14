@@ -62,7 +62,38 @@ void GUI::setupPages()
 
     // pages follow the pipeline: what is shown, how it looks, where it lands
     m_gui.addPage("CONTENT");
-    m_gui.addTitle("Solid colour");
+    m_gui.addTitle("Surface");
+    m_gui.addToggle("Enable", m_dummyBool);
+    m_gui.addToggle("Use Timeline tint", m_dummyBool);
+    m_gui.addToggle("Use Timeline color", m_dummyBool);
+    m_gui.addToggle("Use Timeline alpha", m_dummyBool);
+    m_gui.addToggle("Use Timeline for slides", m_dummyBool);
+    #ifdef WITH_SYPHON
+    m_gui.addToggle("Use Syphon", m_dummyBool);
+    m_gui.addSlider("Syphon origin X", m_dummyFloat, -1600, 1600);
+    m_gui.addSlider("Syphon origin Y", m_dummyFloat, -1600, 1600);
+    m_gui.addSlider("Syphon scale X", m_dummyFloat, 0.1, 10.0);
+    m_gui.addSlider("Syphon scale Y", m_dummyFloat, 0.1, 10.0);
+    #endif
+
+    m_gui.addTitle("Placement");
+    m_gui.addToggle("Fit to quad size", m_dummyBool);
+    m_gui.addToggle("Keep aspect ratio", m_dummyBool);
+    m_gui.addToggle("Center", m_dummyBool);
+    m_gui.addSlider("Scale X", m_dummyFloat, 0.1, 5.0);
+    m_gui.addSlider("Scale Y", m_dummyFloat, 0.1, 5.0);
+    m_gui.addToggle("H mirror", m_dummyBool);
+    m_gui.addToggle("V mirror", m_dummyBool);
+    std::string rotationArray[] = {"0", "90", "180", "270"};
+    m_gui.addComboBox("Rotation", m_dummyInt, 4, rotationArray);
+
+    m_gui.addTitle("Source region");
+    m_gui.addSlider("Region X", m_dummyFloat, 0.0, 1.0);
+    m_gui.addSlider("Region Y", m_dummyFloat, 0.0, 1.0);
+    m_gui.addSlider("Region W", m_dummyFloat, 0.0, 1.0);
+    m_gui.addSlider("Region H", m_dummyFloat, 0.0, 1.0);
+
+    m_gui.addTitle("Solid colour").setNewColumn(true);
     m_gui.addToggle("Solid colour on/off", m_dummyBool);
 
     m_gui.addTitle("Image");
@@ -101,37 +132,6 @@ void GUI::setupPages()
     m_gui.addButton("Load slideshow", m_app->m_loadSlideshowFlag);
     m_gui.addSlider("Slide duration", m_dummyFloat, 0.1, 15.0);
     m_gui.addToggle("Fade transitions", m_dummyBool);
-
-    m_gui.addTitle("Surface").setNewColumn(true);
-    m_gui.addToggle("Enable", m_dummyBool);
-    m_gui.addToggle("Use Timeline tint", m_dummyBool);
-    m_gui.addToggle("Use Timeline color", m_dummyBool);
-    m_gui.addToggle("Use Timeline alpha", m_dummyBool);
-    m_gui.addToggle("Use Timeline for slides", m_dummyBool);
-    #ifdef WITH_SYPHON
-    m_gui.addToggle("Use Syphon", m_dummyBool);
-    m_gui.addSlider("Syphon origin X", m_dummyFloat, -1600, 1600);
-    m_gui.addSlider("Syphon origin Y", m_dummyFloat, -1600, 1600);
-    m_gui.addSlider("Syphon scale X", m_dummyFloat, 0.1, 10.0);
-    m_gui.addSlider("Syphon scale Y", m_dummyFloat, 0.1, 10.0);
-    #endif
-
-    m_gui.addTitle("Placement");
-    m_gui.addToggle("Fit to quad size", m_dummyBool);
-    m_gui.addToggle("Keep aspect ratio", m_dummyBool);
-    m_gui.addToggle("Center", m_dummyBool);
-    m_gui.addSlider("Scale X", m_dummyFloat, 0.1, 5.0);
-    m_gui.addSlider("Scale Y", m_dummyFloat, 0.1, 5.0);
-    m_gui.addToggle("H mirror", m_dummyBool);
-    m_gui.addToggle("V mirror", m_dummyBool);
-    std::string rotationArray[] = {"0", "90", "180", "270"};
-    m_gui.addComboBox("Rotation", m_dummyInt, 4, rotationArray);
-
-    m_gui.addTitle("Source region");
-    m_gui.addSlider("Region X", m_dummyFloat, 0.0, 1.0);
-    m_gui.addSlider("Region Y", m_dummyFloat, 0.0, 1.0);
-    m_gui.addSlider("Region W", m_dummyFloat, 0.0, 1.0);
-    m_gui.addSlider("Region H", m_dummyFloat, 0.0, 1.0);
 
     #ifdef WITH_KINECT
     if(m_app->m_isKinectInitialized)
