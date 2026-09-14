@@ -1,79 +1,88 @@
 # lpmt
 Rewrite of the Little Projection Mapping Tool (http://projection-mapping.org/tools/lpmt/)
 
-This is a fork of LPMT meant to clean up the original codebase and keep the application alive.
-The application is built using OpenFrameworks and therefore can be built for Linux/Mac/Windows
+LPMT is a quad-based projection mapping tool built on openFrameworks. Each surface can show a
+solid colour, an image, a video, a slideshow, a camera, a shared video or an NDI stream, and be
+warped (corners, bezier, grid), masked, edge-blended, colour-corrected and animated on a timeline
+or driven over OSC and MIDI.
 
-The current version has been tested against openFrameworks 0.12.1 so you'll need to install openFrameworks first before you can get this to compile.
+This is a fork of [pierrep/lpmt](https://github.com/pierrep/lpmt), itself a cleanup/rewrite of the
+original [hvfrancesco/lpmt](https://github.com/hvfrancesco/lpmt). It builds against
+**openFrameworks 0.12.1** for Linux, macOS and Windows.
 
-The original LPMT code can be found here: https://github.com/hvfrancesco/lpmt
+## What this fork adds
+* NDI input as a surface source (sender discovery, frame-synced receive)
+* Hardware-accelerated video decode on Linux via GStreamer/VA-API (`make WITH_HWDECODE=1`, see below)
+* Reworked OSC interface: stateless `/surface/<n>/<param>` addressing, documented in
+  [OSC_ADDRESSES.md](OSC_ADDRESSES.md)
+* Source region: show only a part of the content on a surface (`Region X/Y/W/H`, also over OSC)
+* Keyboard editing of surfaces: select and nudge corners, scale, rotate, raise/lower layers
+* GUI reorganised into `CONTENT` / `LOOK` / `GEOMETRY` pages following the render pipeline
 
-## New Features:
-* Improved slideshow functionality (including fades between slides)
-* Added option to auto fit content to quads
-* Use keyboard to move corners of quads
-* Added ability to colorize content as well as control hue/saturation/luminance 
-* Fixed quad copying using CTRL-C and CTRL-V
-* Added an option to draw outlines around masks in order to smooth the edges
-* Added the ability for a surface to receive small images via OSC
-* Added the ability to map different parts of a shared video to different quads
-* Fixed some bugs in the layer system, so now you can happily add and delete surfaces without issues
-* Bezier deformation now renders correctly
-* Unified surfaces so that all options works on all surface types, e.g. Greenscreen shader can now be used on any surface
-* Lots of small bug fixes and stability improvements
-
-Bug fixes or reports are welcome!
-
-Screenshots of the current version:
+## Screenshots
 ![Screenshot of LPMT](screenshots/screenshot1.jpg)
 ![Screenshot of LPMT](screenshots/screenshot2.jpg)
 ![Screenshot of LPMT](screenshots/screenshot3.jpg)
 
 ## OSC control
 
-LPMT listens on port 12345 by default. Surface addressing is stateless
-(`/surface/<n>/<param>`, n = 0..35) so a sender never has to track receiver state.
-The full address reference is in [OSC_ADDRESSES.md](OSC_ADDRESSES.md); example
-controllers live in `bin/data/osc/` (Pure Data patch, TouchOSC layout, JS module).
+LPMT listens on port 12345 by default (`bin/data/config.xml` → `OSC:LISTENING_PORT`).
+The full address reference is in [OSC_ADDRESSES.md](OSC_ADDRESSES.md);
+example controllers live in `bin/data/osc/` (Pure Data patch, TouchOSC layout, JS module) is still for old OSC api, so needs to be modified.
 
-## Installation instructions
+## Installation
 
-Install openFrameworks and follow the setup instructions [here](https://openframeworks.cc/download/)
+Install openFrameworks 0.12.1 following the setup instructions [here](https://openframeworks.cc/download/).
 
-You'll need to add the following addons to your Addons folder:
-
-- https://github.com/danomatika/ofxMidi
-
-e.g.
+Clone the two external addons into the openFrameworks `addons` folder:
 
 ```
 cd openFrameworks/addons
 git clone https://github.com/danomatika/ofxMidi
+git clone https://github.com/leadedge/ofxNDI
 ```
 
-All the other addons are either core ones, or are custom versions specific to LPMT that have been integrated into the main code base (e.g. ofxTimeline)
+All other addons are either core ones (`ofxKinect`, `ofxNetwork`, `ofxOpenCv`, `ofxOsc`,
+`ofxPoco`, `ofxXmlSettings`) or LPMT-specific versions embedded in `src/` (`ofxTimeline`,
+`ofxSimpleGuiToo`, `ofxTween`, `ofxTimecode`, ...).
 
-In the openFrameworks 'myApps' folder (or any other equivalent folder at the same directory level), clone this repository:
+Then clone this repository into `apps/myApps` (or any folder at the same depth):
 
 ```
 cd openFrameworks/apps/myApps
-git clone https://github.com/pierrep/lpmt/
+git clone https://github.com/pavels/lpmt
 ```
 
-### Linux
-Type ```Make``` or use the provided QtCreator project.
+### NDI runtime
 
+`ofxNDI` loads the NDI library at runtime with `dlopen`/`LoadLibrary`, so nothing is needed to
+compile. To actually receive NDI, install the NDI SDK/runtime for your platform:
+
+* Linux: `libndi.so` next to the binary or in `/usr/local/lib` (symlink `libndi.so` → `libndi.so.6`
+  if only the versioned file is installed). Source discovery needs a running `avahi-daemon`.
+* macOS: `libndi.dylib` in `/usr/local/lib`.
+* Windows: the NDI runtime installer (found through `NDI_RUNTIME_DIR_V6`).
+
+Without the runtime LPMT runs normally and NDI surfaces stay blank.
+
+## Building
+
+### Linux
+`make` in the project folder builds with the standard `ofVideoPlayer` (GStreamer software decode).
+
+`make WITH_HWDECODE=1` builds the hardware-decode video player (Intel VA-API through the GStreamer
+`va` plugin). Requires `pkg-config`, `libgstreamer1.0-dev`, `libgstreamer-plugins-base1.0-dev`,
+`libgstreamer-plugins-bad1.0-dev` at build time and the `vah264dec` element at runtime.
+Currently limited to MP4/H.264 files; audio is not played in this mode.
+
+A Qt Creator project (`lpmt.qbs`) is also provided. `.vscode/` contains IntelliSense settings
+for editing in VS Code.
+
+Kinect support is compiled out by default (`WITH_KINECT` in `ofApp.h` and `quad.h`).
 
 ### Windows
-Currently built using VS2017 - use the provided project
+Visual Studio 2017 solution (`lpmt.sln`, toolset v141).
 
-In order to support audio tracks (not yet supported but may be in the future) you'll need to install:
-
- - OpenAL SDK http://openal.org/downloads/
- - Libsndfile SDK (http://www.mega-nerd.com/libsndfile/)
- 
- The included project points to their default location.
- 
-### OSX
-Use the provided XCode project. This project was built and tested on OSX Sierra (10.12)
-
+### macOS
+Xcode project (`lpmt.xcodeproj`). Not tested recently; the project file is kept in sync with the
+source tree but may need SDK/signing adjustments in current Xcode versions.
